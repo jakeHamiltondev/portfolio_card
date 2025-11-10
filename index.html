@@ -50,7 +50,7 @@
             height: 280px;
             perspective: 1500px;
             cursor: pointer;
-            animation: slideUp 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            animation: slideUp 3.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
             opacity: 0;
             transform: translateY(100vh);
             max-width: 90vw;
@@ -103,26 +103,7 @@
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
             background-size: 200% 200%;
             animation: gradientShift 3s ease infinite;
-            position: relative;
-            overflow: hidden;
         }
-
-        /*.card-front::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255, 255, 255, 0.1) 50%,
-                transparent 70%
-            );
-            animation: holographicShine 3s linear infinite;
-        }
-            */
 
         @keyframes gradientShift {
             0%, 100% {
@@ -132,17 +113,6 @@
                 background-position: 100% 50%;
             }
         }
-
-       /*
-        @keyframes holographicShine {
-            0% {
-                transform: rotate(0deg) translate(-50%, -50%);
-            }
-            100% {
-                transform: rotate(360deg) translate(-50%, -50%);
-            }
-        }
-            */
 
         .card-back {
             background: #6366f1;
@@ -592,12 +562,10 @@
             document.getElementById('emailText').textContent = email;
             document.getElementById('phoneText').textContent = phone;
             
-            // Update LinkedIn
             const linkedinLink = document.getElementById('linkedinLink');
             linkedinLink.href = linkedin;
             linkedinLink.textContent = linkedin.replace('https://', '').replace('http://', '');
 
-            // Handle profile picture if a new one was uploaded
             const fileInput = document.getElementById('profilePicInput');
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
@@ -620,7 +588,6 @@
             closeSettings();
         }
 
-        // Live preview when file is selected
         document.getElementById('profilePicInput').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
@@ -657,7 +624,6 @@
             alert(items[index]);
         }
 
-        // 3D Tilt Effect
         const cardContainer = document.querySelector('.card-container');
 
         if (cardContainer) {
