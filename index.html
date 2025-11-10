@@ -278,6 +278,57 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #e5e7eb;
         }
+        /* Responsive adjustments for landscape orientation */
+@media (orientation: landscape) and (max-width: 915px) {
+    .card-container {
+        width: 60vw;           /* Use viewport width for flexibility */
+        height: 70vh;          /* Use viewport height */
+        max-height: 350px;     /* Don't get too tall */
+    }
+    
+    .profile-pic {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .profile-pic-small {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+    @media (max-width: 400px) and (orientation: portrait) {
+        .card-container {
+            width: 85vw;
+            height: 250px;
+        }
+    
+        .profile-pic {
+            width: 160px;
+            height: 160px;
+        }
+    
+        .contact-info h2 {
+            font-size: 20px;
+        }
+    
+        .contact-detail {
+            font-size: 13px;
+        }
+    }
+
+
+    @media (min-width: 768px) {
+        .card-container {
+         width: 520px;
+            height: 300px;
+        }
+    
+        .profile-pic {
+            width: 220px;
+            height: 220px;
+        }
+    }
     </style>
 </head>
 <body>
