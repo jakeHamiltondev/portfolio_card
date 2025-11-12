@@ -647,8 +647,8 @@
                 reader.readAsDataURL(fileInput.files[0]);
             }
 
-            document.getElementById('cardFront').style.backgroundColor = cardColor;
-            document.getElementById('cardBack').style.backgroundColor = cardColor;
+            document.getElementById('cardFront').style.background = `linear-gradient(135deg, ${cardColor} 0%, ${cardColor} 50%, ${cardColor} 100%)`;
+            document.getElementById('cardBack').style.background = cardColor;
             document.body.style.background = `radial-gradient(circle at center, white 0%, ${bgColor} 100%)`;
 
             document.getElementById('cardColorPicker').value = cardColor;
