@@ -1264,7 +1264,7 @@
             const projPage = document.getElementById('projPageInput').value;
             const refPage = document.getElementById('refPageInput').value;
 
-            let profilePicData = document.getElementById('profilePic').src;
+            let profilePicData = uploadedImageData || document.getElementById('profilePic').src;
 
             const cardData = {
                 firstName,
@@ -1366,11 +1366,16 @@
             }
         }
 
+        let uploadedImageData = null; 
+
         document.getElementById('profilePicInput').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    document.getElementById('previewPic').src = event.target.result;
+                    uploadedImageData = event.target.result;  
+                    document.getElementById('previewPic').src = uploadedImageData;
+                    document.getElementById('profilePic').src = uploadedImageData; 
+                    document.getElementById('profilePicSmall').src = uploadedImageData; 
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
