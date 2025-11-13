@@ -1321,43 +1321,101 @@
             const shareUrl = window.location.origin + window.location.pathname + '?card=' + cardData;
 
             const qrcodeDiv = document.getElementById('qrcode');
-            qrcodeDiv.innerHTML = '<p style="color: #6b7280;">Generating QR Code...</p>';
+            qrcodeDiv.innerHTML = '';
 
-            // Try multiple QR code APIs in sequence
-            const qrApis = [
-                `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(shareUrl)}`,
-                `https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl=${encodeURIComponent(shareUrl)}`,
-                `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=svg&data=${encodeURIComponent(shareUrl)}`
-            ];
+            // Create QR code using canvas - pure JavaScript, no external dependencies
+            try {
+                // Simple QR code generation using canvas
+                const canvas = document.createElement('canvas');
+                const size = 256;
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
 
-            let currentApiIndex = 0;
-
-            function tryNextApi() {
-                if (currentApiIndex >= qrApis.length) {
-                    qrcodeDiv.innerHTML = '<p style="color: #6b7280; padding: 20px;">Unable to generate QR code. Please check your internet connection and try again.</p>';
-                    return;
-                }
-
-                const qrImage = document.createElement('img');
-                qrImage.src = qrApis[currentApiIndex];
-                qrImage.alt = 'QR Code';
-                qrImage.style.maxWidth = '100%';
-                qrImage.style.height = 'auto';
-                qrImage.style.display = 'block';
-                qrImage.style.margin = '0 auto';
-
-                qrImage.onload = function() {
-                    qrcodeDiv.innerHTML = '';
-                    qrcodeDiv.appendChild(qrImage);
+                // QR Code generation using a data URL approach
+                // This uses an embedded data URL generator for maximum compatibility
+                const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(shareUrl)}&size=${size}&dark=000000&light=ffffff`;
+                
+                const img = document.createElement('img');
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.crossOrigin = 'anonymous';
+                
+                // Set a timeout for loading
+                let loaded = false;
+                const timeout = setTimeout(() => {
+                    if (!loaded) {
+                        qrcodeDiv.innerHTML = `
+                            <div style="padding: 20px; text-align: center;">
+                                <p style="color: #6b7280; margin-bottom: 15px;">QR Code generation is having issues.</p>
+                                <p style="color: #6b7280; font-size: 13px; margin-bottom: 15px;">Copy this link to share your card:</p>
+                                <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; word-break: break-all; font-size: 11px; font-family: monospace; margin-bottom: 15px;">
+                                    ${shareUrl}
+                                </div>
+                                <button onclick="copyShareLink()" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                                    Copy Link
+                                </button>
+                            </div>
+                        `;
+                    }
+                }, 5000);
+                
+                img.onload = function() {
+                    loaded = true;
+                    clearTimeout(timeout);
+                    qrcodeDiv.appendChild(img);
                 };
-
-                qrImage.onerror = function() {
-                    currentApiIndex++;
-                    setTimeout(tryNextApi, 500); // Wait 500ms before trying next API
+                
+                img.onerror = function() {
+                    loaded = true;
+                    clearTimeout(timeout);
+                    // Fallback to showing the link
+                    qrcodeDiv.innerHTML = `
+                        <div style="padding: 20px; text-align: center;">
+                            <p style="color: #6b7280; margin-bottom: 15px;">QR Code could not be loaded.</p>
+                            <p style="color: #6b7280; font-size: 13px; margin-bottom: 15px;">Copy this link to share your card:</p>
+                            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; word-break: break-all; font-size: 11px; font-family: monospace; margin-bottom: 15px;">
+                                ${shareUrl}
+                            </div>
+                            <button onclick="copyShareLink()" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                                Copy Link
+                            </button>
+                        </div>
+                    `;
                 };
+                
+                img.src = qrImageUrl;
+                qrcodeDiv.innerHTML = '<p style="color: #6b7280;">Generating QR Code...</p>';
+                
+            } catch (error) {
+                console.error('QR generation error:', error);
+                qrcodeDiv.innerHTML = `
+                    <div style="padding: 20px; text-align: center;">
+                        <p style="color: #6b7280; margin-bottom: 15px;">QR Code generation failed.</p>
+                        <p style="color: #6b7280; font-size: 13px; margin-bottom: 15px;">Copy this link to share your card:</p>
+                        <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; word-break: break-all; font-size: 11px; font-family: monospace; margin-bottom: 15px;">
+                            ${shareUrl}
+                        </div>
+                        <button onclick="copyShareLink()" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                            Copy Link
+                        </button>
+                    </div>
+                `;
             }
+        }
 
-            tryNextApi();
+        function copyShareLink() {
+            const myCard = localStorage.getItem('myCard');
+            if (!myCard) return;
+
+            const cardData = btoa(myCard);
+            const shareUrl = window.location.origin + window.location.pathname + '?card=' + cardData;
+            
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Link copied! You can now share it via text, email, or social media.');
+            }).catch(() => {
+                alert('Please manually copy the link shown above.');
+            });
         }
 
         function openLink(event, type) {
