@@ -1020,7 +1020,7 @@
     </div>
 
     <!-- QR Code Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    </script>
 
     <script>
         let isFlipped = false;
@@ -1345,17 +1345,23 @@
 
             const cardData = btoa(myCard);
             const shareUrl = window.location.origin + window.location.pathname + '?card=' + cardData;
-            
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById('qrcode'), {
-                text: shareUrl,
-                width: 256,
-                height: 256,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-            });
-            
+    
             document.getElementById('shareLink').textContent = shareUrl;
+    
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = '';
+    
+            const qrImage = document.createElement('img');
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(shareUrl)}`;
+            qrImage.alt = 'QR Code';
+            qrImage.style.maxWidth = '100%';
+            qrImage.style.height = 'auto';
+    
+            qrImage.onerror = function() {
+                qrcodeDiv.innerHTML = '<p style="color: #6b7280; padding: 20px;">QR Code could not be generated. Please use the link below instead.</p>';
+            };
+    
+            qrcodeDiv.appendChild(qrImage);
         }
 
         function copyLink() {
