@@ -321,6 +321,155 @@
             50% { opacity: 0.4; }
         }
 
+        /* Photo Editor Modal */
+        .photo-editor-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-editor-modal.active {
+            display: flex;
+        }
+
+        .photo-editor-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .photo-editor-content h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .photo-preview-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #6366f1;
+            cursor: move;
+            background: #f3f4f6;
+        }
+
+        .photo-preview-image {
+            position: absolute;
+            max-width: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #6366f1;
+            background: white;
+            color: #6366f1;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .zoom-btn:hover {
+            background: #6366f1;
+            color: white;
+        }
+
+        .zoom-slider {
+            width: 200px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e7eb;
+            outline: none;
+            border-radius: 3px;
+        }
+
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #6366f1;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .zoom-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #6366f1;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .editor-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .editor-btn.cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .editor-btn.cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .editor-btn.save {
+            background: #6366f1;
+            color: white;
+        }
+
+        .editor-btn.save:hover {
+            background: #4f46e5;
+        }
+
+        .editor-instructions {
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
         /* Panel Styles */
         .home-panel, .settings-panel, .share-panel {
             display: none;
@@ -669,6 +818,15 @@
                 flex-direction: column;
                 text-align: center;
             }
+
+            .photo-preview-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .zoom-slider {
+                width: 150px;
+            }
         }
 
         /* Responsive adjustments for landscape orientation */
@@ -741,6 +899,29 @@
     </style>
 </head>
 <body>
+    <!-- Photo Editor Modal -->
+    <div class="photo-editor-modal" id="photoEditor">
+        <div class="photo-editor-content">
+            <h3>Adjust Your Photo</h3>
+            <p class="editor-instructions">Drag to reposition • Use slider to zoom</p>
+            
+            <div class="photo-preview-container" id="previewContainer">
+                <img src="" alt="Preview" class="photo-preview-image" id="previewImage">
+            </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="adjustZoom(-0.1)">−</button>
+                <input type="range" class="zoom-slider" id="zoomSlider" min="100" max="300" value="100" step="1">
+                <button class="zoom-btn" onclick="adjustZoom(0.1)">+</button>
+            </div>
+            
+            <div class="editor-actions">
+                <button class="editor-btn cancel" onclick="cancelPhotoEdit()">Cancel</button>
+                <button class="editor-btn save" onclick="savePhotoEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Home Button -->
     <button class="home-btn" onclick="openHome()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -915,7 +1096,7 @@
                     <div style="flex: 1;">
                         <input type="file" id="profilePicInput" accept="image/*" 
                                style="padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 14px;">
-                        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Upload a photo from your device</p>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Upload a photo - you'll be able to adjust it!</p>
                     </div>
                 </div>
             </div>
@@ -995,10 +1176,157 @@
         let sharedCardData = null;
         let uploadedImageData = null;
 
+        // Photo editor variables
+        let currentImage = null;
+        let imageScale = 1;
+        let imageX = 0;
+        let imageY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
             checkForSharedCard();
+            setupPhotoEditor();
         });
+
+        function setupPhotoEditor() {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const zoomSlider = document.getElementById('zoomSlider');
+
+            // Mouse events
+            previewContainer.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Touch events
+            previewContainer.addEventListener('touchstart', startDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', stopDrag);
+
+            // Zoom slider
+            zoomSlider.addEventListener('input', (e) => {
+                imageScale = e.target.value / 100;
+                updateImageTransform();
+            });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startX = clientX - imageX;
+            startY = clientY - imageY;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            imageX = clientX - startX;
+            imageY = clientY - startY;
+            updateImageTransform();
+        }
+
+        function stopDrag() {
+            isDragging = false;
+        }
+
+        function updateImageTransform() {
+            const previewImage = document.getElementById('previewImage');
+            previewImage.style.transform = `translate(${imageX}px, ${imageY}px) scale(${imageScale})`;
+        }
+
+        function adjustZoom(delta) {
+            const zoomSlider = document.getElementById('zoomSlider');
+            const newValue = parseInt(zoomSlider.value) + (delta * 100);
+            zoomSlider.value = Math.max(100, Math.min(300, newValue));
+            imageScale = zoomSlider.value / 100;
+            updateImageTransform();
+        }
+
+        function openPhotoEditor(imageDataUrl) {
+            const modal = document.getElementById('photoEditor');
+            const previewImage = document.getElementById('previewImage');
+            const previewContainer = document.getElementById('previewContainer');
+            
+            currentImage = imageDataUrl;
+            previewImage.src = imageDataUrl;
+            
+            // Reset transform values
+            imageScale = 1;
+            imageX = 0;
+            imageY = 0;
+            document.getElementById('zoomSlider').value = 100;
+            
+            // Calculate initial positioning to center the image
+            previewImage.onload = function() {
+                const containerSize = 300;
+                const imgWidth = previewImage.naturalWidth;
+                const imgHeight = previewImage.naturalHeight;
+                
+                // Calculate initial scale to fit
+                const scaleToFit = Math.max(containerSize / imgWidth, containerSize / imgHeight);
+                imageScale = scaleToFit;
+                document.getElementById('zoomSlider').value = Math.round(imageScale * 100);
+                
+                // Center the image
+                imageX = (containerSize - imgWidth * imageScale) / 2;
+                imageY = (containerSize - imgHeight * imageScale) / 2;
+                
+                updateImageTransform();
+            };
+            
+            modal.classList.add('active');
+        }
+
+        function cancelPhotoEdit() {
+            document.getElementById('photoEditor').classList.remove('active');
+            currentImage = null;
+            uploadedImageData = null;
+            document.getElementById('profilePicInput').value = '';
+        }
+
+        function savePhotoEdit() {
+            // Create a canvas to capture the edited image
+            const canvas = document.createElement('canvas');
+            const size = 300;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            const previewImage = document.getElementById('previewImage');
+            
+            // Draw the image with current transform
+            ctx.save();
+            
+            // Create circular clipping path
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            
+            // Draw the transformed image
+            ctx.translate(imageX, imageY);
+            ctx.scale(imageScale, imageScale);
+            ctx.drawImage(previewImage, 0, 0);
+            ctx.restore();
+            
+            // Convert to data URL
+            uploadedImageData = canvas.toDataURL('image/png');
+            
+            // Update preview images
+            document.getElementById('previewPic').src = uploadedImageData;
+            document.getElementById('profilePic').src = uploadedImageData;
+            document.getElementById('profilePicSmall').src = uploadedImageData;
+            
+            // Close modal
+            document.getElementById('photoEditor').classList.remove('active');
+        }
 
         function checkForSharedCard() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1323,25 +1651,14 @@
             const qrcodeDiv = document.getElementById('qrcode');
             qrcodeDiv.innerHTML = '';
 
-            // Create QR code using canvas - pure JavaScript, no external dependencies
             try {
-                // Simple QR code generation using canvas
-                const canvas = document.createElement('canvas');
-                const size = 256;
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-
-                // QR Code generation using a data URL approach
-                // This uses an embedded data URL generator for maximum compatibility
-                const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(shareUrl)}&size=${size}&dark=000000&light=ffffff`;
+                const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(shareUrl)}&size=256&dark=000000&light=ffffff`;
                 
                 const img = document.createElement('img');
                 img.style.maxWidth = '100%';
                 img.style.height = 'auto';
                 img.crossOrigin = 'anonymous';
                 
-                // Set a timeout for loading
                 let loaded = false;
                 const timeout = setTimeout(() => {
                     if (!loaded) {
@@ -1369,7 +1686,6 @@
                 img.onerror = function() {
                     loaded = true;
                     clearTimeout(timeout);
-                    // Fallback to showing the link
                     qrcodeDiv.innerHTML = `
                         <div style="padding: 20px; text-align: center;">
                             <p style="color: #6b7280; margin-bottom: 15px;">QR Code could not be loaded.</p>
@@ -1427,14 +1743,12 @@
             }
         }
 
+        // Modified file input handler to open photo editor
         document.getElementById('profilePicInput').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    uploadedImageData = event.target.result;
-                    document.getElementById('previewPic').src = uploadedImageData;
-                    document.getElementById('profilePic').src = uploadedImageData;
-                    document.getElementById('profilePicSmall').src = uploadedImageData;
+                    openPhotoEditor(event.target.result);
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
