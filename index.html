@@ -721,20 +721,23 @@ right: 12px;
 
 .left-content {
 padding-right: 100px;
-display: flex;
-flex-direction: column;
-align-items: center;
 }
 
 .portfolio-links {
-  width: 100%;
+  width: calc(100% + 100px);
+  margin-left: -50px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.portfolio-links h3 {
+  text-align: center;
+}
+
 .portfolio-links-grid {
   max-width: 220px;
+  margin: 0 auto;
 }
 
 }
