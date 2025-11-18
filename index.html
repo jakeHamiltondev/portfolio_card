@@ -475,21 +475,16 @@
 
       .profile-pic-small { width: 85px; height: 85px; top: 12px; right: 12px; }
 
-      .left-content { 
-        padding-right: 100px; 
-      }
+      .left-content { padding-right: 100px; }
 
       .portfolio-links { 
         width: 100%; 
         display: flex; 
         flex-direction: column; 
-        align-items: center; 
-        transform: translate(40px);
+        align-items: center;
+        transform: translateX(40px);
       }
-      
-      .portfolio-links-grid { 
-        max-width: 220px; 
-      }
+      .portfolio-links-grid { max-width: 220px; }
     }
 
     @media (orientation: landscape) and (max-width: 915px) {
@@ -530,14 +525,12 @@
       .profile-pic-small { width: 135px; height: 135px; }
     }
 
-    /* Phone two-part input */
     .phone-inputs { display: flex; gap: 8px; }
     #countryCodeSelect { width: 140px; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
     #localNumberInput { flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
   </style>
 </head>
 <body>
-  <!-- Home Button -->
   <button class="home-btn" onclick="openHome()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -545,7 +538,6 @@
     </svg>
   </button>
 
-  <!-- Share Button -->
   <button class="share-btn" onclick="openShare()" id="shareButton">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
@@ -554,19 +546,16 @@
     </svg>
   </button>
 
-  <!-- Settings Button -->
   <button class="settings-btn" onclick="openSettings()" aria-label="Open settings">
     <span class="settings-btn-inner">
       <svg class="gear" width="24" height="24" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-           aria-hidden="true" focusable="false">
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
     </span>
   </button>
 
-  <!-- Save Contact Button (shown when viewing someone else's card) -->
   <button class="save-contact-btn" id="saveContactBtn" onclick="saveContact()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -574,28 +563,14 @@
     Save to My Contacts
   </button>
 
-  <!-- Business Card -->
   <div class="card-container" onclick="flipCard()">
     <div class="card" id="businessCard">
-      <!-- Front of Card -->
       <div class="card-face card-front" id="cardFront">
-        <img
-          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
-          alt="Profile"
-          class="profile-pic"
-          id="profilePic"
-        />
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="Profile" class="profile-pic" id="profilePic" />
       </div>
 
-      <!-- Back of Card -->
       <div class="card-face card-back" id="cardBack">
-        <!-- Small profile picture in upper right corner -->
-        <img
-          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
-          alt="Profile"
-          class="profile-pic-small"
-          id="profilePicSmall"
-        />
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="Profile" class="profile-pic-small" id="profilePicSmall" />
 
         <div class="left-content">
           <div>
@@ -653,7 +628,6 @@
 
   <div class="hint-text" id="hintText">Click card to see contact info</div>
 
-  <!-- Home Panel -->
   <div class="home-panel" id="homePanel">
     <div class="panel-header">
       <div class="header-left">
@@ -670,19 +644,16 @@
     </div>
 
     <div class="home-content">
-      <!-- My Card Tab -->
       <div class="tab-content active" id="myCardTab">
         <div id="myCardSection"></div>
       </div>
 
-      <!-- Contacts Tab -->
       <div class="tab-content" id="contactsTab">
         <div class="cards-grid" id="contactsGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- Share Panel -->
   <div class="share-panel" id="sharePanel">
     <div class="panel-header">
       <div class="header-left">
@@ -699,7 +670,6 @@
     </div>
   </div>
 
-  <!-- Settings Panel -->
   <div class="settings-panel" id="settingsPanel">
     <div class="panel-header">
       <div class="header-left">
@@ -754,15 +724,7 @@
             <option value="91">+91</option>
             <option value="353">+353</option>
           </select>
-          <input
-            id="localNumberInput"
-            type="text"
-            inputmode="numeric"
-            pattern="\d*"
-            maxlength="10"
-            placeholder="10 digits"
-            aria-label="Phone number (10 digits only)"
-          />
+          <input id="localNumberInput" type="text" inputmode="numeric" pattern="\d*" maxlength="10" placeholder="10 digits" aria-label="Phone number (10 digits only)" />
         </div>
         <div id="phoneError" class="email-error-box" style="display: none;"></div>
       </div>
@@ -770,6 +732,13 @@
       <div class="form-group">
         <label>LinkedIn URL</label>
         <input type="text" id="linkedinInput" value="https://linkedin.com/in/johndoe" placeholder="https://linkedin.com/in/yourname" />
+      </div>
+
+      <div class="form-group">
+        <label>Resume (.docx file)</label>
+        <input type="file" id="resumeInput" accept=".docx" style="padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 14px;" />
+        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Upload your resume in .docx format. Click your name on the card to download it.</p>
+        <div id="resumeStatus" style="font-size: 12px; color: #059669; margin-top: 5px; display: none;"></div>
       </div>
 
       <div class="section-title">PORTFOLIO LINKS</div>
@@ -821,8 +790,9 @@
     let viewingSharedCard = false;
     let sharedCardData = null;
     let uploadedImageData = null;
+    let uploadedResumeData = null;
+    let uploadedResumeFilename = null;
 
-    // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
       checkForSharedCard();
     });
@@ -857,7 +827,6 @@
       }
     }
 
-    // QR helpers
     const encodeObj = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
     const decodeObj = (s) => JSON.parse(decodeURIComponent(escape(atob(s))));
 
@@ -937,7 +906,6 @@
       }
     }
 
-    // Color utilities
     function _hex(h) {
       h = (h || '').trim().toLowerCase();
       if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/.test(h)) return null;
@@ -1108,7 +1076,6 @@
       return yiq >= 128 ? '#111827' : '#ffffff';
     }
 
-    // Name inputs: restrict characters
     setTimeout(() => {
       const first = document.getElementById("firstNameInput");
       const last = document.getElementById("lastNameInput");
@@ -1155,7 +1122,6 @@
       return parts.map(cap).join(" ");
     }
 
-    // Email typing restrictions
     document.getElementById("emailInput").addEventListener("input", function (e) {
       let v = e.target.value.toLowerCase();
       v = v.replace(/[^a-z0-9@._-]/g, "");
@@ -1217,7 +1183,6 @@
       }
     });
 
-    // Country code + 10-digit local number
     const ALLOWED_COUNTRY_CODES = ['1', '44', '61', '81', '91', '353'];
 
     (function () {
@@ -1253,6 +1218,19 @@
       const m = (p || '').match(/^\+?(\d{1,3})\s*\((\d{3})\)\s*(\d{3})-(\d{4})$/);
       if (!m) return null;
       return { cc: m[1], local: m[2] + m[3] + m[4] };
+    }
+
+    function downloadResume(base64Data, filename) {
+      if (!base64Data) {
+        alert('No resume available');
+        return;
+      }
+      const link = document.createElement('a');
+      link.href = base64Data;
+      link.download = filename || 'resume.docx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function saveSettings() {
@@ -1302,6 +1280,8 @@
 
       const f = formatPhone(cc, local);
 
+      const existingCard = JSON.parse(localStorage.getItem('myCard') || '{}');
+
       const cardData = {
         firstName,
         lastName,
@@ -1312,6 +1292,8 @@
         countryCode: cc,
         localNumber: local,
         linkedin,
+        resumeData: uploadedResumeData || existingCard.resumeData,
+        resumeFilename: uploadedResumeFilename || existingCard.resumeFilename,
         cardColor,
         bgColor,
         profilePic: profilePicData,
@@ -1329,6 +1311,8 @@
       applyCardData(cardData);
       loadMyCardSection();
       uploadedImageData = null;
+      uploadedResumeData = null;
+      uploadedResumeFilename = null;
 
       closeSettings();
       alert('Your card has been saved!');
@@ -1337,7 +1321,17 @@
     function applyCardData(cardData) {
       document.getElementById('fullName').textContent = `${cardData.firstName} ${cardData.lastName}`;
       const nameLink = document.getElementById('nameLink');
-      nameLink.href = cardData.linkedin;
+
+      if (cardData.resumeData && !viewingSharedCard) {
+        nameLink.href = '#';
+        nameLink.onclick = function(e) {
+          e.preventDefault();
+          downloadResume(cardData.resumeData, cardData.resumeFilename);
+        };
+      } else {
+        nameLink.href = cardData.linkedin;
+        nameLink.onclick = null;
+      }
 
       document.getElementById('jobTitle').textContent = cardData.jobTitle || '';
 
@@ -1411,6 +1405,12 @@
 
         ccSel.value = (cc && ALLOWED_COUNTRY_CODES.includes(cc)) ? cc : '';
         localIn.value = local ? local.replace(/\D+/g, '').slice(0, 10) : '';
+
+        const resumeStatusDiv = document.getElementById('resumeStatus');
+        if (cardData.resumeData && resumeStatusDiv) {
+          resumeStatusDiv.style.display = 'block';
+          resumeStatusDiv.textContent = `✓ Current resume: ${cardData.resumeFilename || 'resume.docx'}`;
+        }
       }
 
       window.portfolioLinks = cardData.portfolioLinks;
@@ -1514,6 +1514,26 @@
           document.getElementById('profilePicSmall').src = uploadedImageData;
         };
         reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    document.getElementById('resumeInput').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        if (!file.name.endsWith('.docx')) {
+          alert('Please upload a .docx file only');
+          e.target.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          uploadedResumeData = event.target.result;
+          uploadedResumeFilename = file.name;
+          const statusDiv = document.getElementById('resumeStatus');
+          statusDiv.style.display = 'block';
+          statusDiv.textContent = `✓ ${file.name} ready to upload`;
+        };
+        reader.readAsDataURL(file);
       }
     });
 
