@@ -885,7 +885,7 @@
           <div>
             <div class="contact-info">
               <!-- clicking the name goes to LinkedIn -->
-              <a href="https://linkedin.com/in/johndoe" id="nameLink" target="_blank" style="color: white; text-decoration: none;">
+              <a id="nameLink" target="_blank" style="color: white; text-decoration: none;">
                 <h2 id="fullName">John Doe</h2>
                 <div id="jobTitle" style="font-size:14px;opacity:.9;margin:4px 0 10px;"></div>
               </a>
@@ -1065,28 +1065,28 @@
       </div>
 
       <div class="form-group">
-        <label>First Name</label>
-        <input type="text" id="firstNameInput" value="John" />
+        <label>First Name (Required)</label>
+        <input type="text" id="firstNameInput" value="John" placeholder="ex: John" />
       </div>
 
       <div class="form-group">
-        <label>Last Name</label>
-        <input type="text" id="lastNameInput" value="Doe" />
+        <label>Last Name (Required)</label>
+        <input type="text" id="lastNameInput" value="Doe" placeholder="ex: Doe" />
       </div>
 
       <div class="form-group">
         <label>Job Title</label>
-        <input type="text" id="jobTitleInput" value="Student" />
+        <input type="text" id="jobTitleInput" value="Student" placeholder="Student"/>
       </div>
 
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="emailInput" value="john.doe@email.com" />
+        <label>Email (Required)</label>
+        <input type="email" id="emailInput" value="john.doe@email.com" placeholder="ex: john.doe@email.com"/>
         <div class="email-error-box" id="emailErrorBox"></div>
       </div>
 
       <div class="form-group">
-        <label>Phone</label>
+        <label>Phone (Required)</label>
 
         <div class="phone-inputs">
           <!-- keep the list short and obvious -->
@@ -1107,7 +1107,6 @@
             pattern="\d*"
             maxlength="10"
             placeholder="10 digits"
-            aria-label="Phone number (10 digits only)"
           />
         </div>
 
@@ -1163,7 +1162,7 @@
       <button class="save-btn" onclick="saveSettings()">Save My Card</button>
       <!-- NEW: Reset to John Doe button -->
       <button class="save-btn" onclick="resetToJohnDoe()" style="margin-top:12px;background:#ef4444">
-        Reset to John Doe (clear local data)
+        Reset Card to Default (John Doe)
       </button>
     </div>
   </div>
@@ -1187,7 +1186,7 @@
       lastName: 'Doe',
       jobTitle: 'Student',
       email: 'john.doe@email.com',
-      phone: '+1 (555) 123-4567',
+      phone: '+1 (555)-123-4567',
       phoneE164: '+15551234567',
       countryCode: '1',
       localNumber: '5551234567',
@@ -1750,12 +1749,13 @@
       }
     }
 
-    function parsePrettyPhone10(p) {
-      const m = (p || '').match(/^\+?(\d{1,3})\s*\((\d{3})\)\s*(\d{3})-(\d{4})$/);
-      if (!m) return null;
-      return { cc: m[1], local: m[2] + m[3] + m[4] };
-    }
-
+function parsePrettyPhone10(p) {
+  const m = (p || '').match(/^\+?(\d{1,3})\s*\((\d{3})\)\s*(\d{3})-(\d{4})$/);
+  if (!m) return null;
+  const local = m[2] + m[3] + m[4];                     // 10 digits (for formatPhone)
+  const prettyLocal = `(${m[2]})-${m[3]}-${m[4]}`;      // (xxx)-xxx-xxxx
+  return { cc: m[1], local, prettyLocal };
+}
 
     /* ==========================================================
        SAVE SETTINGS (validate → persist → apply)
@@ -2116,8 +2116,7 @@
     function applyCardData(cardData) {
       document.getElementById('fullName').textContent = `${cardData.firstName} ${cardData.lastName}`;
       const nameLink = document.getElementById('nameLink');
-      nameLink.href = cardData.linkedin || '#';
-      nameLink.target = '_blank';
+
 
       document.getElementById('jobTitle').textContent = cardData.jobTitle || '';
 
@@ -2222,7 +2221,7 @@
 
       applyCardData(DEFAULT_CARD);
       loadMyCardSection();
-      alert('Reset to John Doe.');
+      alert('Are you sure you want to reset to default?');
     }
 
   </script>
