@@ -2,59 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Digital Portfolio Card</title>
+
   <style>
+    /* ===============================
+       BASE / RESET
+       (keep this boring stuff short)
+       =============================== */
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+
+    /* ===============================
+       PAGE LAYOUT
+       =============================== */
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
       min-height: 100vh;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       background: radial-gradient(circle at center, white 0%, #6B46C1 100%);
+
       position: relative;
       overflow-x: hidden;
       overflow-y: auto;
+
+      /* comfy padding so nothing hugs edges */
       padding: 90px 20px 120px;
     }
+
+
+    /* ===============================
+       FLOATING BUTTONS (Home / Share / Settings)
+       =============================== */
 
     .home-btn,
     .settings-btn,
     .share-btn {
       position: fixed;
       top: 15px;
+
       width: 50px;
       height: 50px;
+
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.95);
       border: 2px solid rgba(107, 70, 193, 0.3);
+
       cursor: pointer;
+
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       z-index: 100;
+
       transition: all 0.3s;
     }
 
-    .home-btn {
-      left: 15px;
-    }
-
-    .settings-btn {
-      right: 15px;
-    }
-
-    .share-btn {
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    .home-btn  { left: 15px; }
+    .settings-btn { right: 15px; }
+    .share-btn  { left: 50%; transform: translateX(-50%); }
 
     .home-btn:hover,
     .settings-btn:hover,
@@ -63,32 +85,48 @@
       transform: scale(1.05);
     }
 
+    /* keep the share button centered when hovering */
     .share-btn:hover {
       transform: translateX(-50%) scale(1.05);
     }
 
+    /* tiny gear delight */
     .settings-btn:hover { transform: none; }
     .settings-btn .settings-btn-inner { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; transition: transform .2s ease; }
     .settings-btn:hover .settings-btn-inner { transform: scale(1.05); }
     .settings-btn .gear { display: block; transform-origin: 50% 50%; transform-box: fill-box; transition: transform .25s linear; will-change: transform; backface-visibility: hidden; }
     .settings-btn:hover .gear { animation: none; transform: rotate(180deg); }
 
+
+    /* ===============================
+       SAVE CONTACT BUTTON (only when viewing shared card)
+       =============================== */
+
     .save-contact-btn {
       position: fixed;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
+
       padding: 15px 30px;
+
       background: white;
       color: #6366f1;
+
       border: 2px solid #6366f1;
       border-radius: 50px;
+
       font-size: 16px;
       font-weight: 600;
+
       cursor: pointer;
+
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
       z-index: 100;
+
       transition: all 0.3s;
+
       display: none;
     }
 
@@ -109,16 +147,27 @@
       box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
+
+    /* ===============================
+       CARD (3D flip, tilt, slide-in)
+       =============================== */
+
     .card-container {
       width: 480px;
       height: 280px;
+
       perspective: 1500px;
       cursor: pointer;
+
+      /* fun intro animation */
       animation: slideUp 3.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
       opacity: 0;
       transform: translateY(100vh);
+
       max-width: 90vw;
+
       transition: transform 0.1s ease-out;
+
       flex-shrink: 0;
     }
 
@@ -132,6 +181,7 @@
       width: 100%;
       height: 100%;
       position: relative;
+
       transform-style: preserve-3d;
       transition: transform 0.7s;
     }
@@ -142,18 +192,25 @@
       position: absolute;
       width: 100%;
       height: 100%;
+
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       -moz-backface-visibility: hidden;
+
       border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
-                  0 0 30px rgba(99, 102, 241, 0.5),
-                  inset 0 0 20px rgba(255, 255, 255, 0.1);
+
+      /* glow + depth */
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(99, 102, 241, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
+    /* front = gradient + big photo */
     .card-front {
       background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
       background-size: 200% 200%;
@@ -169,26 +226,41 @@
       50%      { background-position: 100% 50%; }
     }
 
+    /* back = details side */
     .card-back {
       background: #6366f1;
       transform: rotateY(180deg);
+
       padding: 24px;
       position: relative;
       overflow: hidden;
+
       display: block;
+
       color: var(--card-text, #fff);
     }
 
-    .card-back a { color: var(--card-text, #fff) !important; text-decoration: none; }
+    .card-back a {
+      color: var(--card-text, #fff) !important;
+      text-decoration: none;
+    }
 
+    /* photos */
     .profile-pic {
       width: 200px;
       height: 200px;
+
       border-radius: 50%;
       object-fit: cover;
+
       border: 5px solid white;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.5);
+
+      box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(255, 255, 255, 0.5);
+
       animation: profilePulse 2s ease-in-out infinite;
+
       position: relative;
       z-index: 1;
     }
@@ -202,28 +274,35 @@
       position: absolute;
       top: 24px;
       right: 24px;
+
       width: 135px;
       height: 135px;
+
       border-radius: 16px;
       object-fit: cover;
+
       border: 3px solid white;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
       z-index: 10;
     }
 
+    /* main back-side layout */
     .left-content {
       width: 100%;
       height: 100%;
+
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
       color: var(--card-text, #f9fafb);
+
       padding-right: 90px;
     }
 
-    .contact-info { color: inherit; }
-
-    .contact-info h2 {
+    .contact-info   { color: inherit; }
+    .contact-info h2{
       font-size: 24px;
       margin-bottom: 12px;
       font-weight: 600;
@@ -262,13 +341,19 @@
     .portfolio-link {
       background: var(--card-chip-bg, rgba(255, 255, 255, 0.2));
       border: none;
+
       color: var(--card-text, #fff);
+
       padding: 8px 10px;
+
       border-radius: 8px;
       cursor: pointer;
+
       width: 100%;
       text-align: center;
+
       transition: all 0.3s;
+
       font-size: 12px;
       display: block;
     }
@@ -280,14 +365,22 @@
 
     .right-content { display: none; }
 
+
+    /* ===============================
+       HINT TEXT
+       =============================== */
+
     .hint-text {
       position: fixed;
       bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
+
       color: rgba(255, 255, 255, 0.8);
       font-size: 14px;
+
       animation: pulse 2s infinite;
+
       z-index: 50;
     }
 
@@ -296,28 +389,42 @@
       50%      { opacity: 0.4; }
     }
 
+
+    /* ===============================
+       PANELS (Home / Settings / Share)
+       =============================== */
+
     .home-panel,
     .settings-panel,
     .share-panel {
       display: none;
+
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
+
       background: white;
+
       z-index: 200;
+
       overflow-y: auto;
     }
 
     .home-panel.active,
     .settings-panel.active,
-    .share-panel.active { display: block; }
+    .share-panel.active {
+      display: block;
+    }
 
     .panel-header {
       background: white;
+
       padding: 20px;
+
       border-bottom: 1px solid #e5e7eb;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -333,14 +440,22 @@
       padding: 10px;
     }
 
+
+    /* ===============================
+       HOME PANEL TABS + GRID
+       =============================== */
+
     .tab-container {
       position: sticky;
       top: 0;
       z-index: 10;
+
       display: flex;
       justify-content: center;
       gap: 10px;
+
       margin-top: 10px;
+
       border-bottom: 2px solid #e5e7eb;
     }
 
@@ -348,21 +463,28 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+
       padding: 10px 20px;
+
       background: none;
       border: none;
       cursor: pointer;
+
       font-size: 15px;
       font-weight: 500;
+
       color: #6b7280;
+
       border-bottom: 2px solid transparent;
+
       margin-bottom: -2px;
+
       transition: all 0.2s;
     }
 
     .tab.active { color: #6366f1; border-bottom-color: #6366f1; }
 
-    .tab-content { display: none; }
+    .tab-content        { display: none; }
     .tab-content.active { display: block; }
 
     .home-content { max-width: 1200px; margin: 0 auto; padding: 30px; }
@@ -379,16 +501,36 @@
       border: 2px solid #e5e7eb;
       border-radius: 12px;
       padding: 20px;
+
       cursor: pointer;
+
       transition: all 0.3s;
+
       position: relative;
     }
 
-    .saved-card:hover { border-color: #6366f1; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transform: translateY(-2px); }
+    .saved-card:hover {
+      border-color: #6366f1;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      transform: translateY(-2px);
+    }
 
-    .saved-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+    .saved-card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
 
-    .saved-card-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+    .saved-card-pic {
+      width: 60px;
+      height: 60px;
+
+      border-radius: 50%;
+      object-fit: cover;
+
+      border: 2px solid #e5e7eb;
+    }
 
     .saved-card-info h3 { font-size: 18px; margin-bottom: 4px; }
     .saved-card-info p  { font-size: 14px; color: #6b7280; }
@@ -397,12 +539,18 @@
 
     .action-btn {
       flex: 1;
+
       padding: 8px;
+
       border: 1px solid #e5e7eb;
       background: white;
+
       border-radius: 6px;
+
       cursor: pointer;
+
       font-size: 13px;
+
       transition: all 0.2s;
     }
 
@@ -423,12 +571,22 @@
 
     .my-card-preview { display: flex; align-items: center; gap: 20px; }
 
-    .my-card-pic { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; }
+    .my-card-pic {
+      width: 80px;
+      height: 80px;
+
+      border-radius: 50%;
+      object-fit: cover;
+
+      border: 3px solid white;
+    }
 
     .my-card-details h4 { font-size: 22px; margin-bottom: 8px; }
     .my-card-details p  { font-size: 14px; opacity: 0.9; }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #6b7280;
+    }
     .empty-state svg { margin: 0 auto 20px; opacity: 0.5; }
     .empty-state h3  { font-size: 20px; margin-bottom: 10px; color: #374151; }
     .empty-state p   { font-size: 14px; }
@@ -439,31 +597,129 @@
     .cards-grid.is-empty { display: grid; grid-template-columns: 1fr; min-height: 55vh; place-items: center; }
     .cards-grid.is-empty .empty-state { text-align: center; max-width: 420px; }
 
+
+    /* ===============================
+       SHARE PANEL
+       =============================== */
+
     .share-content { max-width: 500px; margin: 0 auto; padding: 30px; text-align: center; }
 
-    .qr-code-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin: 30px 0; }
+    .qr-code-container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 30px 0;
+    }
 
     #qrcode { display: flex; justify-content: center; margin: 20px 0; }
 
     .share-instructions { color: #6b7280; font-size: 14px; margin: 20px 0; line-height: 1.6; }
 
+
+    /* ===============================
+       SETTINGS PANEL (form stuff)
+       =============================== */
+
     .settings-content { max-width: 600px; margin: 0 auto; padding: 30px; }
 
     .form-group { margin-bottom: 20px; }
 
-    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #374151; }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
 
-    .form-group input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
 
     .color-input-group { display: flex; gap: 10px; }
 
-    .color-input-group input[type="color"] { width: 80px; height: 45px; border: 1px solid #d1d5db; border-radius: 8px; cursor: pointer; }
+    .color-input-group input[type="color"] {
+      width: 80px; height: 45px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-    .save-btn { width: 100%; background: #111827; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 30px; }
+    .save-btn {
+      width: 100%;
+
+      background: #111827;
+      color: white;
+
+      padding: 15px;
+
+      border: none;
+      border-radius: 8px;
+
+      font-size: 16px;
+      font-weight: 500;
+
+      cursor: pointer;
+
+      margin-top: 30px;
+    }
 
     .save-btn:hover { background: #1f2937; }
 
-    .section-title { font-size: 18px; font-weight: 600; color: #111827; margin: 30px 0 15px 0; display: flex; align-items: center; justify-content: center; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+
+      margin: 30px 0 15px 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .email-error-box {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-size: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 6px;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .phone-inputs { display: flex; gap: 8px; }
+
+    #countryCodeSelect {
+      width: 140px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    #localNumberInput {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+
+    /* ===============================
+       RESPONSIVE (phones & small screens)
+       =============================== */
 
     @media (max-width: 768px) {
       body {
@@ -472,10 +728,17 @@
 
       .home-btn,
       .settings-btn,
-      .share-btn { width: 55px; height: 55px; top: 10px; background: rgba(255, 255, 255, 1); border: 3px solid #6B46C1; }
+      .share-btn {
+        width: 55px;
+        height: 55px;
+        top: 10px;
+        background: rgba(255, 255, 255, 1);
+        border: 3px solid #6B46C1;
+      }
+
       .home-btn { left: 10px; }
       .settings-btn { right: 10px; }
-      .share-btn { left: 50%; transform: translateX(-50%); }
+      .share-btn    { left: 50%; transform: translateX(-50%); }
 
       .card-container {
         height: 300px;
@@ -489,13 +752,16 @@
 
       .left-content { padding-right: 100px; }
 
-      .portfolio-links { 
-        width: 100%; 
-        display: flex; 
-        flex-direction: column; 
+      .portfolio-links {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
         align-items: center;
+
+        /* small shift so it feels centered */
         transform: translateX(40px);
       }
+
       .portfolio-links-grid { max-width: 220px; }
 
       .hint-text {
@@ -517,17 +783,6 @@
       .card-back { padding: 20px; }
     }
 
-    .email-error-box {
-      background: #fee2e2;
-      color: #b91c1c;
-      font-size: 12px;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 6px;
-      display: none;
-      line-height: 1.4;
-    }
-
     @media (max-width: 400px) and (orientation: portrait) {
       body {
         padding: 75px 10px 150px;
@@ -542,30 +797,33 @@
       .left-content { padding-right: 95px; }
     }
 
+    /* small spacing tweaks on card text block */
     .contact-info { margin-bottom: 12px; }
     .contact-info a { display: block; }
     .contact-info h2 { margin-bottom: 0; }
 
     @media (min-width: 768px) {
       .card-container { width: 520px; height: 300px; }
-      .profile-pic { width: 220px; height: 220px; }
+      .profile-pic     { width: 220px; height: 220px; }
       .profile-pic-small { width: 135px; height: 135px; }
     }
-
-    .phone-inputs { display: flex; gap: 8px; }
-    #countryCodeSelect { width: 140px; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
-    #localNumberInput { flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
   </style>
 </head>
+
 <body>
-  <button class="home-btn" onclick="openHome()">
+  <!-- =================================
+       FLOATING BUTTONS
+       (Home / Share / Settings)
+       ================================= -->
+
+  <button class="home-btn" onclick="openHome()" aria-label="Open home panel">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
       <polyline points="9 22 9 12 15 12 15 22"></polyline>
     </svg>
   </button>
 
-  <button class="share-btn" onclick="openShare()" id="shareButton">
+  <button class="share-btn" onclick="openShare()" id="shareButton" aria-label="Open share panel">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
       <polyline points="16 6 12 2 8 6"></polyline>
@@ -583,6 +841,11 @@
     </span>
   </button>
 
+
+  <!-- =================================
+       SAVE CONTACT (only appears on shared view)
+       ================================= -->
+
   <button class="save-contact-btn" id="saveContactBtn" onclick="saveContact()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -590,18 +853,38 @@
     Save to My Contacts
   </button>
 
+
+  <!-- =================================
+       CARD (Front + Back)
+       ================================= -->
+
   <div class="card-container" onclick="flipCard()">
     <div class="card" id="businessCard">
+
+      <!-- FRONT: just the big profile picture -->
       <div class="card-face card-front" id="cardFront">
-        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="Profile" class="profile-pic" id="profilePic" />
+        <img
+          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
+          alt="Profile"
+          class="profile-pic"
+          id="profilePic"
+        />
       </div>
 
+      <!-- BACK: contact info + portfolio links -->
       <div class="card-face card-back" id="cardBack">
-        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="Profile" class="profile-pic-small" id="profilePicSmall" />
+
+        <img
+          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
+          alt="Profile"
+          class="profile-pic-small"
+          id="profilePicSmall"
+        />
 
         <div class="left-content">
           <div>
             <div class="contact-info">
+              <!-- clicking the name goes to LinkedIn -->
               <a href="https://linkedin.com/in/johndoe" id="nameLink" target="_blank" style="color: white; text-decoration: none;">
                 <h2 id="fullName">John Doe</h2>
                 <div id="jobTitle" style="font-size:14px;opacity:.9;margin:4px 0 10px;"></div>
@@ -609,6 +892,7 @@
             </div>
 
             <div class="contact-detail">
+              <!-- email line -->
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                 <polyline points="22,6 12,13 2,6"></polyline>
@@ -619,6 +903,7 @@
             </div>
 
             <div class="contact-detail">
+              <!-- phone line -->
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
               </svg>
@@ -628,6 +913,7 @@
             </div>
 
             <div class="contact-detail">
+              <!-- LinkedIn line -->
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                 <rect x="2" y="9" width="4" height="12"></rect>
@@ -649,11 +935,20 @@
             </div>
           </div>
         </div>
-      </div>
+
+      </div><!-- /card-back -->
+
     </div>
   </div>
 
+
+  <!-- small nudge for first-time users -->
   <div class="hint-text" id="hintText">Click card to see contact info</div>
+
+
+  <!-- =================================
+       HOME PANEL (My Card + Saved Contacts)
+       ================================= -->
 
   <div class="home-panel" id="homePanel">
     <div class="panel-header">
@@ -681,6 +976,11 @@
     </div>
   </div>
 
+
+  <!-- =================================
+       SHARE PANEL (QR Code + link)
+       ================================= -->
+
   <div class="share-panel" id="sharePanel">
     <div class="panel-header">
       <div class="header-left">
@@ -688,14 +988,46 @@
         <h2>Share My Card</h2>
       </div>
     </div>
+
     <div class="share-content">
       <h3 style="margin-bottom: 10px;">Share via QR Code</h3>
-      <p class="share-instructions">Others can scan this QR code with their phone camera to view and save your business card.</p>
+
+      <p class="share-instructions">
+        Others can scan this QR code to view and save your business card.
+      </p>
+
+      <!-- New: Base URL override input -->
+      <div style="text-align:left;max-width:500px;margin:0 auto 12px;">
+        <label for="qrBaseInput" style="display:block;font-size:13px;color:#374151;margin-bottom:6px;">
+          Base URL used in the QR (use your LAN/host URL if needed)
+        </label>
+        <input id="qrBaseInput" type="text"
+               placeholder="http://192.168.1.23:5500/yourfile.html"
+               style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+        <small style="display:block;color:#6b7280;margin-top:6px;line-height:1.4;">
+          Tip: If you’re on <code>file://</code> or <code>http://localhost</code>, other phones can’t reach it. Run a tiny server and use your computer’s IP, e.g. <code>http://192.168.1.23:5500/yourfile.html</code>.
+        </small>
+      </div>
+
       <div class="qr-code-container">
         <div id="qrcode"></div>
+
+        <!-- handy buttons -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+          <button class="action-btn" onclick="generateQRCode()">Regenerate</button>
+          <button class="action-btn" onclick="copyShareLink()">Copy Link</button>
+          <button class="action-btn" onclick="openShareLink()">Open Link</button>
+        </div>
       </div>
+
+      <div id="qrWarnings" style="max-width:500px;margin:0 auto;text-align:center;color:#b91c1c;"></div>
     </div>
   </div>
+
+
+  <!-- =================================
+       SETTINGS PANEL (edit + save)
+       ================================= -->
 
   <div class="settings-panel" id="settingsPanel">
     <div class="panel-header">
@@ -704,15 +1036,29 @@
         <h2>My Card Settings</h2>
       </div>
     </div>
+
     <div class="settings-content">
       <div class="section-title">PROFILE INFORMATION</div>
 
       <div class="form-group">
         <label>Profile Picture</label>
+
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-          <img id="previewPic" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="Preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #d1d5db;" />
+          <!-- small preview so you know what you picked -->
+          <img
+            id="previewPic"
+            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
+            alt="Preview"
+            style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #d1d5db;"
+          />
+
           <div style="flex: 1;">
-            <input type="file" id="profilePicInput" accept="image/*" style="padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 14px;" />
+            <input
+              type="file"
+              id="profilePicInput"
+              accept="image/*"
+              style="padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 14px;"
+            />
             <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Upload a photo from your device</p>
           </div>
         </div>
@@ -741,7 +1087,9 @@
 
       <div class="form-group">
         <label>Phone</label>
+
         <div class="phone-inputs">
+          <!-- keep the list short and obvious -->
           <select id="countryCodeSelect" aria-label="Country code">
             <option value="">Country code…</option>
             <option value="1">+1</option>
@@ -751,21 +1099,25 @@
             <option value="91">+91</option>
             <option value="353">+353</option>
           </select>
-          <input id="localNumberInput" type="text" inputmode="numeric" pattern="\d*" maxlength="10" placeholder="10 digits" aria-label="Phone number (10 digits only)" />
+
+          <input
+            id="localNumberInput"
+            type="text"
+            inputmode="numeric"
+            pattern="\d*"
+            maxlength="10"
+            placeholder="10 digits"
+            aria-label="Phone number (10 digits only)"
+          />
         </div>
+
+        <!-- re-using email-error-box style for phone errors too -->
         <div id="phoneError" class="email-error-box" style="display: none;"></div>
       </div>
 
       <div class="form-group">
         <label>LinkedIn URL</label>
         <input type="text" id="linkedinInput" value="https://linkedin.com/in/johndoe" placeholder="https://linkedin.com/in/yourname" />
-      </div>
-
-      <div class="form-group">
-        <label>Resume (.docx file)</label>
-        <input type="file" id="resumeInput" accept=".docx" style="padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 14px;" />
-        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Upload your resume in .docx format. Click your name on the card to download it.</p>
-        <div id="resumeStatus" style="font-size: 12px; color: #059669; margin-top: 5px; display: none;"></div>
       </div>
 
       <div class="section-title">PORTFOLIO LINKS</div>
@@ -812,17 +1164,42 @@
     </div>
   </div>
 
+
   <script>
+    /* ==========================================================
+       SIMPLE STATE (stuff we need across functions)
+       ========================================================== */
+
     let isFlipped = false;
-    let viewingSharedCard = false;
-    let sharedCardData = null;
-    let uploadedImageData = null;
-    let uploadedResumeData = null;
-    let uploadedResumeFilename = null;
+    let viewingSharedCard = false;  // true when you open someone else’s shared card
+    let sharedCardData = null;      // the decoded shared data
+
+    // temp holders for uploads before saving
+    let uploadedImageData   = null;
+
+
+
+    /* ==========================================================
+       BOOT: when the page is ready, figure out if we’re viewing
+       our own card or a shared one via ?card=...
+       ========================================================== */
 
     window.addEventListener('DOMContentLoaded', () => {
       checkForSharedCard();
     });
+
+
+    /* ==========================================================
+       TINY ENCODERS (just packing JSON into URL-safe base64)
+       ========================================================== */
+
+    const encodeObj = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+    const decodeObj = (s) => JSON.parse(decodeURIComponent(escape(atob(s))));
+
+
+    /* ==========================================================
+       SHARED CARD CHECKER
+       ========================================================== */
 
     function checkForSharedCard() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -830,12 +1207,21 @@
 
       if (cardData) {
         viewingSharedCard = true;
+
         try {
           sharedCardData = decodeObj(cardData);
+
           applyCardData(sharedCardData);
-          document.getElementById('saveContactBtn').classList.add('show');
-          document.getElementById('shareButton').style.display = 'none';
-          document.getElementById('hintText').textContent = 'Click card to see full details';
+
+          // show save btn and hide Share (makes sense for visitors)
+          const saveBtn = document.getElementById('saveContactBtn');
+          if (saveBtn) saveBtn.classList.add('show');
+
+          const shareBtn = document.getElementById('shareButton');
+          if (shareBtn) shareBtn.style.display = 'none';
+
+          const hint = document.getElementById('hintText');
+          if (hint) hint.textContent = 'Click card to see full details';
         } catch (e) {
           console.error('Invalid card data', e);
           loadMyCard();
@@ -844,37 +1230,52 @@
         loadMyCard();
       }
     }
+          
+    /* ==========================================================
+       MY CARD: load from localStorage if you’ve saved one
+       ========================================================== */
 
     function loadMyCard() {
       viewingSharedCard = false;
+
       const myCard = localStorage.getItem('myCard');
+
       if (myCard) {
         const cardData = JSON.parse(myCard);
         applyCardData(cardData);
       }
     }
 
-    const encodeObj = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
-    const decodeObj = (s) => JSON.parse(decodeURIComponent(escape(atob(s))));
+
+    /* ==========================================================
+       SHARE PAYLOAD BUILDER (don’t leak files/blobs)
+       ========================================================== */
 
     function buildShareObj(raw) {
       return {
         firstName: raw.firstName,
-        lastName: raw.lastName,
-        jobTitle: raw.jobTitle,
-        email: raw.email,
-        phone: raw.phone,
+        lastName:  raw.lastName,
+        jobTitle:  raw.jobTitle,
+        email:     raw.email,
+        phone:     raw.phone,
         phoneE164: raw.phoneE164,
-        linkedin: raw.linkedin,
+        linkedin:  raw.linkedin,
         cardColor: raw.cardColor,
-        bgColor: raw.bgColor,
+        bgColor:   raw.bgColor,
+        profilePic: raw.profilePic,        // include image so recipients see your face
         portfolioLinks: raw.portfolioLinks || {},
       };
     }
 
+
+    /* ==========================================================
+       CARD FLIP (click the card)
+       ========================================================== */
+
     function flipCard() {
       const card = document.getElementById('businessCard');
       const hint = document.getElementById('hintText');
+
       isFlipped = !isFlipped;
 
       if (isFlipped) {
@@ -885,6 +1286,11 @@
         hint.style.display = 'block';
       }
     }
+
+
+    /* ==========================================================
+       PANELS: Home / Share / Settings (open/close)
+       ========================================================== */
 
     function openHome() {
       document.getElementById('homePanel').classList.add('active');
@@ -904,6 +1310,14 @@
       }
 
       document.getElementById('sharePanel').classList.add('active');
+
+      // Pre-fill the base URL with current page (without ?card=…)
+      const baseField = document.getElementById('qrBaseInput');
+      if (baseField) {
+        const cleanBase = `${location.origin}${location.pathname}`;
+        if (!baseField.value.trim()) baseField.value = cleanBase;
+      }
+
       generateQRCode();
     }
 
@@ -919,6 +1333,12 @@
       document.getElementById('settingsPanel').classList.remove('active');
     }
 
+
+    /* ==========================================================
+       HOME TABS (My Card / Contacts)
+       (yeah, this uses the global `event` from inline onclick)
+       ========================================================== */
+
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       event.target.classList.add('active');
@@ -932,6 +1352,11 @@
         loadContacts();
       }
     }
+
+
+    /* ==========================================================
+       COLOR HELPERS (keep it small and not scary)
+       ========================================================== */
 
     function _hex(h) {
       h = (h || '').trim().toLowerCase();
@@ -953,15 +1378,47 @@
       return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
     }
 
-    function textOn(hex) { return _lum(hex) > 0.5 ? '#111827' : '#ffffff'; }
+    function textOn(hex) {
+      return _lum(hex) > 0.5 ? '#111827' : '#ffffff';
+    }
+
+    function isHexColor(v) {
+      return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test((v || '').trim());
+    }
+
+    function pickColor(textVal, pickerVal, fallback) {
+      const t = (textVal || '').trim();
+      if (isHexColor(t)) return t.toLowerCase();
+      if (isHexColor(pickerVal)) return pickerVal.toLowerCase();
+      return fallback;
+    }
+
+    function contrastColor(hex) {
+      let c = (hex || '#000').replace('#', '').trim();
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const r = parseInt(c.slice(0, 2), 16) || 0;
+      const g = parseInt(c.slice(2, 4), 16) || 0;
+      const b = parseInt(c.slice(4, 6), 16) || 0;
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq >= 128 ? '#111827' : '#ffffff';
+    }
+
+
+    /* ==========================================================
+       HOME: “My Card” section preview
+       ========================================================== */
 
     function loadMyCardSection() {
       const myCard = localStorage.getItem('myCard');
       const section = document.getElementById('myCardSection');
+
       if (!myCard) {
         section.innerHTML = `
           <div class="empty-state">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
             <h3>Create Your Business Card</h3>
             <p>Set up your digital business card to share with others</p>
             <button class="save-btn" onclick="openSettings()" style="max-width:200px;margin:20px auto 0;">Create My Card</button>
@@ -970,12 +1427,16 @@
       }
 
       const card = JSON.parse(myCard);
+
       const accent = card.cardColor || '#6366f1';
       const text = textOn(accent);
+
       const chipBg = text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)';
       const chipBorder = text === '#ffffff' ? '#ffffff' : 'rgba(0,0,0,0.2)';
+
       const editText = _lum(accent) > 0.85 ? '#111827' : accent;
       const borderColor = _lum(accent) < 0.45 ? '#ffffff' : '#111827';
+
       const nameLine = (card.jobTitle && card.jobTitle.trim())
         ? `${card.firstName} ${card.lastName} - ${card.jobTitle}`
         : `${card.firstName} ${card.lastName}`;
@@ -983,20 +1444,33 @@
       section.innerHTML = `
         <div class="my-card-section" style="background:${accent};color:${text};border:2px solid ${borderColor}">
           <h3 style="color:${text}">My Business Card</h3>
+
           <div class="my-card-preview">
             <img src="${card.profilePic}" alt="${card.firstName}" class="my-card-pic">
+
             <div class="my-card-details">
               <h4 style="color:${text}">${nameLine}</h4>
-              <p style="color:${text}">${card.email}</p>
-              <p style="color:${text}">${card.phone || ''}</p>
+              <p  style="color:${text}">${card.email}</p>
+              <p  style="color:${text}">${card.phone || ''}</p>
             </div>
           </div>
+
           <div style="display:flex;gap:10px;margin-top:20px;">
-            <button class="action-btn" onclick="closeHome(); openSettings();" style="background:#fff;color:${editText};font-weight:600;border:1px solid ${chipBorder}">Edit Card</button>
-            <button class="action-btn" onclick="closeHome(); openShare();" style="background:${chipBg};color:${text};border:1px solid ${chipBorder};font-weight:600">Share Card</button>
+            <button class="action-btn" onclick="closeHome(); openSettings();" style="background:#fff;color:${editText};font-weight:600;border:1px solid ${chipBorder}">
+              Edit Card
+            </button>
+
+            <button class="action-btn" onclick="closeHome(); openShare();" style="background:${chipBg};color:${text};border:1px solid ${chipBorder};font-weight:600">
+              Share Card
+            </button>
           </div>
         </div>`;
     }
+
+
+    /* ==========================================================
+       CONTACTS (little local “address book”)
+       ========================================================== */
 
     function loadContacts() {
       const contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
@@ -1004,6 +1478,7 @@
 
       if (contacts.length === 0) {
         grid.classList.add('is-empty');
+
         grid.innerHTML = `
           <div class="empty-state">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1019,6 +1494,7 @@
       }
 
       grid.classList.remove('is-empty');
+
       grid.innerHTML = contacts.map((contact, index) => `
         <div class="saved-card">
           <div class="saved-card-header">
@@ -1028,6 +1504,7 @@
               <p>${contact.email}</p>
             </div>
           </div>
+
           <div class="saved-card-actions">
             <button class="action-btn" onclick="viewContact(${index})">View</button>
             <button class="action-btn delete-btn" onclick="deleteContact(${index})">Delete</button>
@@ -1041,10 +1518,11 @@
 
       let contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
 
+      // basic duplicate check
       const exists = contacts.some(c =>
         c.firstName === sharedCardData.firstName &&
-        c.lastName === sharedCardData.lastName &&
-        c.email === sharedCardData.email
+        c.lastName  === sharedCardData.lastName  &&
+        c.email     === sharedCardData.email
       );
 
       if (exists) {
@@ -1079,33 +1557,20 @@
       let contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
       contacts.splice(index, 1);
       localStorage.setItem('savedContacts', JSON.stringify(contacts));
+
       loadContacts();
     }
 
-    function isHexColor(v) {
-      return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test((v || '').trim());
-    }
 
-    function pickColor(textVal, pickerVal, fallback) {
-      const t = (textVal || '').trim();
-      if (isHexColor(t)) return t.toLowerCase();
-      if (isHexColor(pickerVal)) return pickerVal.toLowerCase();
-      return fallback;
-    }
+    /* ==========================================================
+       EMAIL + NAME INPUT FILTERS (keep it clean-ish)
+       ========================================================== */
 
-    function contrastColor(hex) {
-      let c = (hex || '#000').replace('#', '').trim();
-      if (c.length === 3) c = c.split('').map(x => x + x).join('');
-      const r = parseInt(c.slice(0, 2), 16) || 0;
-      const g = parseInt(c.slice(2, 4), 16) || 0;
-      const b = parseInt(c.slice(4, 6), 16) || 0;
-      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-      return yiq >= 128 ? '#111827' : '#ffffff';
-    }
-
+    // soften name typing: letters, hyphen, apostrophes, spaces (last name)
     setTimeout(() => {
       const first = document.getElementById("firstNameInput");
-      const last = document.getElementById("lastNameInput");
+      const last  = document.getElementById("lastNameInput");
+
       if (first) {
         first.addEventListener("input", () => {
           let v = first.value;
@@ -1113,6 +1578,7 @@
           first.value = v;
         });
       }
+
       if (last) {
         last.addEventListener("input", () => {
           let v = last.value;
@@ -1122,26 +1588,33 @@
       }
     }, 300);
 
+    // format name nicely (handles Van der, O'Neil, etc.)
     function formatName(name, isLastName = false) {
       name = name.trim();
+
       if (isLastName) name = name.replace(/\s+/g, " ");
-      else name = name.replace(/\s+/g, "");
+      else            name = name.replace(/\s+/g, "");
 
       const allowedRegex = isLastName ? /^[A-Za-z' -]+$/ : /^[A-Za-z'-]+$/;
       if (!allowedRegex.test(name)) return null;
+
       if (name.length < 1 || name.length > 30) return null;
 
       const particles = ["de", "del", "la", "las", "los", "da", "das", "dos", "van", "von", "der", "den", "le", "du", "di"];
 
       function cap(word) {
         const lower = word.toLowerCase();
+
         if (particles.includes(lower)) return lower;
+
         if (lower.includes("-")) {
           return lower.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("-");
         }
+
         if (lower.includes("'")) {
           return lower.split("'").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("'");
         }
+
         return lower.charAt(0).toUpperCase() + lower.slice(1);
       }
 
@@ -1149,16 +1622,20 @@
       return parts.map(cap).join(" ");
     }
 
+    // chill email cleaner (not overkill)
     document.getElementById("emailInput").addEventListener("input", function (e) {
       let v = e.target.value.toLowerCase();
-      v = v.replace(/[^a-z0-9@._-]/g, "");
-      v = v.replace(/\s+/g, "");
-      const a = v.indexOf("@");
+
+      v = v.replace(/[^a-z0-9@._-]/g, "");  // keep basic email chars
+      v = v.replace(/\s+/g, "");            // no spaces
+
       if (v.includes("@")) {
-        let local = v.slice(0, a);
-        let domain = v.slice(a + 1).replace(/[0-9]/g, "");
+        const a = v.indexOf("@");
+        let local  = v.slice(0, a);
+        let domain = v.slice(a + 1).replace(/[0-9]/g, ""); // simple: domains here only letters/dots/hyphens
         v = local + "@" + domain;
       }
+
       e.target.value = v;
     });
 
@@ -1167,33 +1644,33 @@
       let errors = [];
 
       if (e.length < 5 || e.length > 80) errors.push("Email length must be between 5–80 characters.");
+
       const atCount = (e.match(/@/g) || []).length;
       if (atCount !== 1) errors.push("Must contain exactly one '@'symbol.");
 
-      if (e.includes("..")) errors.push("Email cannot contain consecutive dots.");
-      if (e.startsWith(".")) errors.push("Email cannot start with a dot.");
-      if (e.endsWith(".")) errors.push("Email cannot end with a dot.");
-      if (e.startsWith("-")) errors.push("Email cannot start with a dash.");
+      if (e.includes(".."))       errors.push("Email cannot contain consecutive dots.");
+      if (e.startsWith("."))      errors.push("Email cannot start with a dot.");
+      if (e.endsWith("."))        errors.push("Email cannot end with a dot.");
+      if (e.startsWith("-"))      errors.push("Email cannot start with a dash.");
 
       if (atCount === 1) {
-        const parts = e.split("@");
-        const local = parts[0];
-        const domain = parts[1];
+        const [local, domain] = e.split("@");
 
-        if (!local.length) errors.push("Missing text before '@'.");
-        if (!domain.includes(".")) errors.push("Domain must contain a dot.");
-        if (domain.includes("..")) errors.push("Domain cannot contain consecutive dots.");
-        if (domain.startsWith(".")) errors.push("Domain cannot start with a dot.");
-        if (domain.endsWith(".")) errors.push("Domain cannot end with a dot.");
-        if (/[0-9]/.test(domain)) errors.push("Domain cannot contain numbers.");
+        if (!local.length)                    errors.push("Missing text before '@'.");
+        if (!domain.includes("."))            errors.push("Domain must contain a dot.");
+        if (domain.includes(".."))            errors.push("Domain cannot contain consecutive dots.");
+        if (domain.startsWith("."))           errors.push("Domain cannot start with a dot.");
+        if (domain.endsWith("."))             errors.push("Domain cannot end with a dot.");
+        if (/[0-9]/.test(domain))             errors.push("Domain cannot contain numbers.");
 
         let tld = domain.split(".").pop();
-        if (tld.length < 2) errors.push("Top-level domain must be at least 2 letters.");
+        if ((tld || '').length < 2)           errors.push("Top-level domain must be at least 2 letters.");
       }
 
       return errors;
     }
 
+    // live email feedback
     const emailInput = document.getElementById("emailInput");
     const emailErrorBox = document.getElementById("emailErrorBox");
 
@@ -1210,28 +1687,36 @@
       }
     });
 
+
+    /* ==========================================================
+       PHONE (country code + 10 digits)
+       ========================================================== */
+
     const ALLOWED_COUNTRY_CODES = ['1', '44', '61', '81', '91', '353'];
 
     (function () {
       const localInput = document.getElementById('localNumberInput');
       if (!localInput) return;
+
       const filter = () => {
         let v = localInput.value.replace(/\D+/g, '');
         if (v.length > 10) v = v.slice(0, 10);
         localInput.value = v;
       };
+
       ['input', 'paste', 'change', 'blur'].forEach(evt => localInput.addEventListener(evt, filter));
     })();
 
     function formatPhone(cc, local10) {
       const pretty = `+${cc} (${local10.slice(0, 3)}) ${local10.slice(3, 6)}-${local10.slice(6)}`;
-      const e164 = `+${cc}${local10}`;
+      const e164   = `+${cc}${local10}`;
       return { pretty, e164 };
     }
 
     function showPhoneError(msg) {
       const box = document.getElementById('phoneError');
       if (!box) return;
+
       if (msg) {
         box.style.display = 'block';
         box.innerHTML = msg;
@@ -1247,28 +1732,19 @@
       return { cc: m[1], local: m[2] + m[3] + m[4] };
     }
 
-    function downloadResume(base64Data, filename) {
-      if (!base64Data) {
-        alert('No resume available');
-        return;
-      }
-      const link = document.createElement('a');
-      link.href = base64Data;
-      link.download = filename || 'resume.docx';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+
+    /* ==========================================================
+       SAVE SETTINGS (validate → persist → apply)
+       ========================================================== */
 
     function saveSettings() {
-      let firstName = formatName(document.getElementById('firstNameInput').value, false);
-      let lastName  = formatName(document.getElementById('lastNameInput').value, true);
-
+      const firstName = formatName(document.getElementById('firstNameInput').value, false);
+      const lastName  = formatName(document.getElementById('lastNameInput').value, true);
       if (!firstName) { alert("Invalid first name."); return; }
       if (!lastName)  { alert("Invalid last name."); return; }
 
-      let emailErrors = getEmailErrors(document.getElementById('emailInput').value);
-      if (emailErrors.length > 0) {
+      const emailErrors = getEmailErrors(document.getElementById('emailInput').value);
+      if (emailErrors.length) {
         alert("Email invalid:\n- " + emailErrors.join("\n- "));
         return;
       }
@@ -1279,7 +1755,6 @@
 
       const cc    = (document.getElementById('countryCodeSelect').value || '').trim();
       const local = (document.getElementById('localNumberInput').value || '').trim();
-
       if (!cc) { showPhoneError('Please choose a country code.'); return; }
       if (!ALLOWED_COUNTRY_CODES.includes(cc)) { showPhoneError('Country code is not allowed.'); return; }
       if (local.length !== 10) { showPhoneError('Phone number must be exactly 10 digits.'); return; }
@@ -1291,7 +1766,6 @@
         document.getElementById('cardColorPicker').value,
         '#6366f1'
       );
-
       const bgColor = pickColor(
         document.getElementById('bgColorInput').value,
         document.getElementById('bgColorPicker').value,
@@ -1304,10 +1778,7 @@
       const refPage  = document.getElementById('refPageInput').value;
 
       let profilePicData = uploadedImageData || document.getElementById('profilePic').src;
-
       const f = formatPhone(cc, local);
-
-      const existingCard = JSON.parse(localStorage.getItem('myCard') || '{}');
 
       const cardData = {
         firstName,
@@ -1319,53 +1790,318 @@
         countryCode: cc,
         localNumber: local,
         linkedin,
-        resumeData: uploadedResumeData || existingCard.resumeData,
-        resumeFilename: uploadedResumeFilename || existingCard.resumeFilename,
         cardColor,
         bgColor,
         profilePic: profilePicData,
-        portfolioLinks: {
-          cert: certPage,
-          edu: eduPage,
-          proj: projPage,
-          ref: refPage
-        },
+        portfolioLinks: { cert: certPage, edu: eduPage, proj: projPage, ref: refPage },
         lastUpdated: new Date().toISOString()
       };
 
-      localStorage.setItem('myCard', JSON.stringify(cardData));
+      try {
+        localStorage.setItem('myCard', JSON.stringify(cardData));
+      } catch (err) {
+        console.error(err);
+        alert('Could not save your card (storage full). Try reducing image size.');
+        return;
+      }
 
       applyCardData(cardData);
       loadMyCardSection();
+
+      // clear temp image variables
       uploadedImageData = null;
-      uploadedResumeData = null;
-      uploadedResumeFilename = null;
 
       closeSettings();
       alert('Your card has been saved!');
     }
 
+
+    /* ==========================================================
+       SHARE: QR Code (with Base URL override)
+       ========================================================== */
+
+    function generateQRCode() {
+      const myCard = localStorage.getItem('myCard');
+      const qrBox  = document.getElementById('qrcode');
+      const warns  = document.getElementById('qrWarnings');
+      const baseField = document.getElementById('qrBaseInput');
+
+      if (!myCard || !qrBox) return;
+
+      const raw = JSON.parse(myCard);
+      const shareObj = buildShareObj(raw);
+      const cardData = encodeObj(shareObj);
+
+      // Choose base URL (custom if provided)
+      let base = `${location.origin}${location.pathname}`;
+      const custom = (baseField && baseField.value.trim()) || '';
+      if (custom) base = custom;
+
+      // Normalize (strip any existing query)
+      try {
+        const u = new URL(base, window.location.href);
+        u.search = '';
+        base = u.href;
+      } catch {
+        // if user typed bare text, we’ll leave it as-is
+      }
+
+      const shareUrl = `${base}${base.includes('?') ? '&' : '?'}card=${cardData}`;
+
+      // Clear previous content/warnings
+      qrBox.innerHTML = '';
+      if (warns) warns.innerHTML = '';
+
+      // Warn for file:// or localhost (not reachable by other phones)
+      try {
+        const uTest = new URL(base, window.location.href);
+        const proto = (uTest.protocol || '').replace(':','');
+        const host  = (uTest.hostname || '').toLowerCase();
+
+        if (proto === 'file') {
+          if (warns) warns.innerHTML =
+            'This is a local file (<code>file://</code>). Phones cannot open that. Run a tiny web server and use your LAN URL above.';
+        } else if (host === 'localhost' || host === '127.0.0.1') {
+          if (warns) warns.innerHTML =
+            'The QR points to <code>localhost</code>. Other devices cannot reach it. Replace the Base URL with your LAN IP (e.g. <code>http://192.168.1.23:5500/yourfile.html</code>).';
+        }
+      } catch {}
+
+      // If payload too big, just show the link
+      if (cardData.length > 2000) {
+        qrBox.innerHTML = `
+          <div style="padding:20px;text-align:center;">
+            <p style="color:#6b7280;margin-bottom:12px;">Link is long; use copy/open instead:</p>
+            <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:12px;">${shareUrl}</div>
+          </div>`;
+        return;
+      }
+
+      // Render via quickchart.io
+      const img = document.createElement('img');
+      img.style.maxWidth = '100%';
+      img.style.height   = 'auto';
+      img.crossOrigin    = 'anonymous';
+
+      let loaded = false;
+      const timeout = setTimeout(() => {
+        if (!loaded) {
+          qrBox.innerHTML = `
+            <div style="padding:20px;text-align:center;">
+              <p style="color:#6b7280;margin-bottom:12px;">QR generation timed out.</p>
+              <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:12px;">${shareUrl}</div>
+            </div>`;
+        }
+      }, 5000);
+
+      img.onload = function () {
+        loaded = true;
+        clearTimeout(timeout);
+        qrBox.innerHTML = '';
+        qrBox.appendChild(img);
+      };
+
+      img.onerror = function () {
+        loaded = true;
+        clearTimeout(timeout);
+        qrBox.innerHTML = `
+          <div style="padding:20px;text-align:center;">
+            <p style="color:#6b7280;margin-bottom:12px;">QR image failed to load.</p>
+            <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:12px;">${shareUrl}</div>
+          </div>`;
+      };
+
+      img.src = `https://quickchart.io/qr?text=${encodeURIComponent(shareUrl)}&size=256&dark=000000&light=ffffff`;
+    }
+
+    function buildShareUrlFromUI() {
+      const myCard = localStorage.getItem('myCard');
+      if (!myCard) return `${location.origin}${location.pathname}`;
+
+      const raw = JSON.parse(myCard);
+      const shareObj = buildShareObj(raw);
+      const cardData = encodeObj(shareObj);
+
+      const baseField = document.getElementById('qrBaseInput');
+      let base = `${location.origin}${location.pathname}`;
+      const custom = (baseField && baseField.value.trim()) || '';
+      if (custom) base = custom;
+
+      try {
+        const u = new URL(base, window.location.href);
+        u.search = '';
+        base = u.href;
+      } catch {}
+
+      return `${base}${base.includes('?') ? '&' : '?'}card=${cardData}`;
+    }
+
+    function copyShareLink() {
+      const url = buildShareUrlFromUI();
+      navigator.clipboard.writeText(url)
+        .then(() => alert('Link copied!'))
+        .catch(() => alert('Copy failed; please select and copy manually.'));
+    }
+
+    function openShareLink() {
+      const url = buildShareUrlFromUI();
+      window.open(url, '_blank');
+    }
+
+    // auto-regenerate QR if the base field changes
+    (function watchQRBase() {
+      const baseFieldEl = document.getElementById('qrBaseInput');
+      if (!baseFieldEl) return;
+      baseFieldEl.addEventListener('change', generateQRCode);
+      baseFieldEl.addEventListener('blur', generateQRCode);
+    })();
+
+
+    /* ==========================================================
+       PORTFOLIO BUTTONS (open link if set)
+       ========================================================== */
+
+    function openLink(event, type) {
+      event.stopPropagation();
+
+      if (window.portfolioLinks && window.portfolioLinks[type]) {
+        window.open(window.portfolioLinks[type], '_blank');
+      } else {
+        alert('No link available');
+      }
+    }
+
+
+    /* ==========================================================
+       UPLOAD HANDLER (photo)
+       ========================================================== */
+
+    document.getElementById('profilePicInput').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          uploadedImageData = event.target.result;
+
+          document.getElementById('previewPic').src       = uploadedImageData;
+          document.getElementById('profilePic').src       = uploadedImageData;
+          document.getElementById('profilePicSmall').src  = uploadedImageData;
+        };
+
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+
+    /* ==========================================================
+       COLOR PICKERS (sync text input ↔ color input)
+       ========================================================== */
+
+    document.getElementById('cardColorPicker').addEventListener('input', (e) => {
+      document.getElementById('cardColorInput').value = e.target.value;
+    });
+
+    document.getElementById('cardColorInput').addEventListener('input', (e) => {
+      document.getElementById('cardColorPicker').value = e.target.value;
+    });
+
+    document.getElementById('bgColorPicker').addEventListener('input', (e) => {
+      document.getElementById('bgColorInput').value = e.target.value;
+    });
+
+    document.getElementById('bgColorInput').addEventListener('input', (e) => {
+      document.getElementById('bgColorPicker').value = e.target.value;
+    });
+
+
+    /* ==========================================================
+       CARD PARALLAX (tilt on mouse / touch)
+       ========================================================== */
+
+    const cardContainer = document.querySelector('.card-container');
+
+    if (cardContainer) {
+      cardContainer.addEventListener('mousemove', (e) => {
+        if (window.innerWidth > 768) {
+          const rect = cardContainer.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const rotateX = (y - centerY) / 10;
+          const rotateY = (centerX - x) / 10;
+
+          cardContainer.style.transform =
+            `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+      });
+
+      cardContainer.addEventListener('mouseleave', () => {
+        cardContainer.style.transform =
+          'perspective(1500px) rotateX(0deg) rotateY(0deg)';
+      });
+
+      cardContainer.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const rect = cardContainer.getBoundingClientRect();
+
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = (y - centerY) / 15;
+        const rotateY = (centerX - x) / 15;
+
+        cardContainer.style.transform =
+          `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      cardContainer.addEventListener('touchend', () => {
+        cardContainer.style.transform =
+          'perspective(1500px) rotateX(0deg) rotateY(0deg)';
+      });
+    }
+
+    // prevent accidental flip when clicking interactive elements
+    (function preventAccidentalFlip() {
+      const cardRoot = document.getElementById('businessCard');
+      if (!cardRoot) return;
+
+      // anything inside here counts as "interactive"
+      const NO_FLIP = 'a, button, input, select, textarea, [data-no-flip], .portfolio-link';
+
+      // use capture so we intercept before the container's onclick="flipCard()"
+      ['click', 'touchstart'].forEach(evt => {
+        cardRoot.addEventListener(evt, (e) => {
+          if (e.target.closest(NO_FLIP)) {
+            e.stopPropagation(); // keep the card from flipping
+          }
+        }, { capture: true });
+      });
+    })();
+
+
+    /* ==========================================================
+       APPLY CARD DATA → reflect on the UI
+       ========================================================== */
+
     function applyCardData(cardData) {
       document.getElementById('fullName').textContent = `${cardData.firstName} ${cardData.lastName}`;
       const nameLink = document.getElementById('nameLink');
-
-      if (cardData.resumeData && !viewingSharedCard) {
-        nameLink.href = '#';
-        nameLink.onclick = function(e) {
-          e.preventDefault();
-          downloadResume(cardData.resumeData, cardData.resumeFilename);
-        };
-      } else {
-        nameLink.href = cardData.linkedin;
-        nameLink.onclick = null;
-      }
+      nameLink.href = cardData.linkedin || '#';
+      nameLink.target = '_blank';
 
       document.getElementById('jobTitle').textContent = cardData.jobTitle || '';
 
       const linkedinLink = document.getElementById('linkedinLink');
-      linkedinLink.href = cardData.linkedin;
-      linkedinLink.textContent = cardData.linkedin.replace('https://', '').replace('http://', '');
+      linkedinLink.href = cardData.linkedin || '#';
+      linkedinLink.textContent = (cardData.linkedin || '').replace('https://', '').replace('http://', '');
 
+      // phone pretty + tel link
       const phoneTextEl = document.getElementById('phoneText');
       const phoneLinkEl = document.getElementById('phoneLink');
 
@@ -1384,14 +2120,17 @@
       phoneTextEl.textContent = pretty || '';
       phoneLinkEl.href = e164 ? 'tel:' + e164 : '#';
 
+      // email
       document.getElementById('emailText').textContent = cardData.email;
       const emailLink = document.getElementById('emailLink');
       emailLink.href = 'mailto:' + cardData.email;
 
+      // images
       document.getElementById('profilePic').src = cardData.profilePic;
       document.getElementById('profilePicSmall').src = cardData.profilePic;
       document.getElementById('previewPic').src = cardData.profilePic;
 
+      // colors
       document.getElementById('cardFront').style.background = `linear-gradient(135deg, ${cardData.cardColor} 0%, ${cardData.cardColor} 50%, ${cardData.cardColor} 100%)`;
       document.getElementById('cardBack').style.background = cardData.cardColor;
       const textColor = contrastColor(cardData.cardColor);
@@ -1403,12 +2142,13 @@
       cardBackEl.style.setProperty('--card-chip-bg-hover', chipBgHover);
       document.body.style.background = `radial-gradient(circle at center, white 0%, ${cardData.bgColor} 100%)`;
 
+      // populate settings form only on your own card
       if (!viewingSharedCard) {
         document.getElementById('firstNameInput').value = cardData.firstName;
         document.getElementById('lastNameInput').value = cardData.lastName;
         document.getElementById('jobTitleInput').value = cardData.jobTitle || '';
         document.getElementById('emailInput').value = cardData.email;
-        document.getElementById('linkedinInput').value = cardData.linkedin;
+        document.getElementById('linkedinInput').value = cardData.linkedin || '';
         document.getElementById('cardColorInput').value = cardData.cardColor;
         document.getElementById('cardColorPicker').value = cardData.cardColor;
         document.getElementById('bgColorInput').value = cardData.bgColor;
@@ -1430,200 +2170,15 @@
           if (parsed) { cc = parsed.cc; local = parsed.local; }
         }
 
-        ccSel.value = (cc && ALLOWED_COUNTRY_CODES.includes(cc)) ? cc : '';
+        const ALLOWED_COUNTRY_CODES_LOCAL = ['1', '44', '61', '81', '91', '353'];
+        ccSel.value = (cc && ALLOWED_COUNTRY_CODES_LOCAL.includes(cc)) ? cc : '';
         localIn.value = local ? local.replace(/\D+/g, '').slice(0, 10) : '';
-
-        const resumeStatusDiv = document.getElementById('resumeStatus');
-        if (cardData.resumeData && resumeStatusDiv) {
-          resumeStatusDiv.style.display = 'block';
-          resumeStatusDiv.textContent = `✓ Current resume: ${cardData.resumeFilename || 'resume.docx'}`;
-        }
       }
 
+      // stash links so the portfolio buttons know where to go
       window.portfolioLinks = cardData.portfolioLinks;
     }
 
-    function generateQRCode() {
-      const myCard = localStorage.getItem('myCard');
-      if (!myCard) return;
-
-      const raw = JSON.parse(myCard);
-      const shareObj = buildShareObj(raw);
-      const cardData = encodeObj(shareObj);
-      const shareUrl = `${location.origin}${location.pathname}?card=${cardData}`;
-
-      const qrcodeDiv = document.getElementById('qrcode');
-      qrcodeDiv.innerHTML = '';
-
-      try {
-        const size = 256;
-        const img = document.createElement('img');
-        img.style.maxWidth = '100%';
-        img.style.height = 'auto';
-        img.crossOrigin = 'anonymous';
-
-        if (cardData.length > 2000) {
-          qrcodeDiv.innerHTML = `
-            <div style="padding:20px;text-align:center;">
-              <p style="color:#6b7280;margin-bottom:15px;">QR payload is too large.</p>
-              <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:15px;">${shareUrl}</div>
-              <button onclick="copyShareLink()" style="background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;">Copy Link</button>
-            </div>`;
-          return;
-        }
-
-        let loaded = false;
-        const timeout = setTimeout(() => {
-          if (!loaded) {
-            qrcodeDiv.innerHTML = `
-              <div style="padding:20px;text-align:center;">
-                <p style="color:#6b7280;margin-bottom:15px;">QR Code generation is having issues.</p>
-                <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:15px;">${shareUrl}</div>
-                <button onclick="copyShareLink()" style="background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;">Copy Link</button>
-              </div>`;
-          }
-        }, 5000);
-
-        img.onload = function () {
-          loaded = true;
-          clearTimeout(timeout);
-          qrcodeDiv.appendChild(img);
-        };
-
-        img.onerror = function () {
-          loaded = true;
-          clearTimeout(timeout);
-          qrcodeDiv.innerHTML = `
-            <div style="padding:20px;text-align:center;">
-              <p style="color:#6b7280;margin-bottom:15px;">QR Code could not be loaded.</p>
-              <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;font-size:11px;font-family:monospace;margin-bottom:15px;">${shareUrl}</div>
-              <button onclick="copyShareLink()" style="background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;">Copy Link</button>
-            </div>`;
-        };
-
-        img.src = `https://quickchart.io/qr?text=${encodeURIComponent(shareUrl)}&size=${size}&dark=000000&light=ffffff`;
-        qrcodeDiv.innerHTML = '<p style="color:#6b7280;">Generating QR Code...</p>';
-      } catch (error) {
-        console.error('QR generation error:', error);
-      }
-    }
-
-    function copyShareLink() {
-      const myCard = localStorage.getItem('myCard');
-      if (!myCard) return;
-
-      const raw = JSON.parse(myCard);
-      const shareObj = buildShareObj(raw);
-      const cardData = encodeObj(shareObj);
-      const shareUrl = `${location.origin}${location.pathname}?card=${cardData}`;
-
-      navigator.clipboard.writeText(shareUrl)
-        .then(() => alert('Link copied! You can now share it via text, email, or social media.'))
-        .catch(() => alert('Please manually copy the link shown above.'));
-    }
-
-    function openLink(event, type) {
-      event.stopPropagation();
-      if (window.portfolioLinks && window.portfolioLinks[type]) {
-        window.open(window.portfolioLinks[type], '_blank');
-      } else {
-        alert('No link available');
-      }
-    }
-
-    document.getElementById('profilePicInput').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          uploadedImageData = event.target.result;
-          document.getElementById('previewPic').src = uploadedImageData;
-          document.getElementById('profilePic').src = uploadedImageData;
-          document.getElementById('profilePicSmall').src = uploadedImageData;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-
-    document.getElementById('resumeInput').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const file = e.target.files[0];
-        if (!file.name.endsWith('.docx')) {
-          alert('Please upload a .docx file only');
-          e.target.value = '';
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          uploadedResumeData = event.target.result;
-          uploadedResumeFilename = file.name;
-          const statusDiv = document.getElementById('resumeStatus');
-          statusDiv.style.display = 'block';
-          statusDiv.textContent = `✓ ${file.name} ready to upload`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    document.getElementById('cardColorPicker').addEventListener('input', (e) => {
-      document.getElementById('cardColorInput').value = e.target.value;
-    });
-
-    document.getElementById('cardColorInput').addEventListener('input', (e) => {
-      document.getElementById('cardColorPicker').value = e.target.value;
-    });
-
-    document.getElementById('bgColorPicker').addEventListener('input', (e) => {
-      document.getElementById('bgColorInput').value = e.target.value;
-    });
-
-    document.getElementById('bgColorInput').addEventListener('input', (e) => {
-      document.getElementById('bgColorPicker').value = e.target.value;
-    });
-
-    const cardContainer = document.querySelector('.card-container');
-
-    if (cardContainer) {
-      cardContainer.addEventListener('mousemove', (e) => {
-        if (window.innerWidth > 768) {
-          const rect = cardContainer.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-
-          const rotateX = (y - centerY) / 10;
-          const rotateY = (centerX - x) / 10;
-
-          cardContainer.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        }
-      });
-
-      cardContainer.addEventListener('mouseleave', () => {
-        cardContainer.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg)';
-      });
-
-      cardContainer.addEventListener('touchmove', (e) => {
-        const touch = e.touches[0];
-        const rect = cardContainer.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = (y - centerY) / 15;
-        const rotateY = (centerX - x) / 15;
-
-        cardContainer.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      });
-
-      cardContainer.addEventListener('touchend', () => {
-        cardContainer.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg)';
-      });
-    }
   </script>
 </body>
 </html>
-
-
