@@ -1161,6 +1161,10 @@
       </div>
 
       <button class="save-btn" onclick="saveSettings()">Save My Card</button>
+      <!-- NEW: Reset to John Doe button -->
+      <button class="save-btn" onclick="resetToJohnDoe()" style="margin-top:12px;background:#ef4444">
+        Reset to John Doe (clear local data)
+      </button>
     </div>
   </div>
 
@@ -1177,6 +1181,23 @@
     // temp holders for uploads before saving
     let uploadedImageData   = null;
 
+    // --- Default "John Doe" card used on reset / first load ---
+    const DEFAULT_CARD = {
+      firstName: 'John',
+      lastName: 'Doe',
+      jobTitle: 'Student',
+      email: 'john.doe@email.com',
+      phone: '+1 (555) 123-4567',
+      phoneE164: '+15551234567',
+      countryCode: '1',
+      localNumber: '5551234567',
+      linkedin: 'https://linkedin.com/in/johndoe',
+      cardColor: '#6366f1',
+      bgColor: '#6B46C1',
+      profilePic: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      portfolioLinks: { cert: '', edu: '', proj: '', ref: '' },
+      lastUpdated: ''
+    };
 
 
     /* ==========================================================
@@ -1243,6 +1264,9 @@
       if (myCard) {
         const cardData = JSON.parse(myCard);
         applyCardData(cardData);
+      } else {
+        // fallback to defaults when nothing saved
+        applyCardData(DEFAULT_CARD);
       }
     }
 
@@ -2177,6 +2201,28 @@
 
       // stash links so the portfolio buttons know where to go
       window.portfolioLinks = cardData.portfolioLinks;
+    }
+
+    /* ==========================================================
+       RESET to John Doe (clear local data, remove ?card=)
+       ========================================================== */
+    function resetToJohnDoe() {
+      try {
+        localStorage.removeItem('myCard');
+      } catch (_) {}
+
+      // strip ?card=... from URL so a shared link doesn't override
+      if (location.search.includes('card=')) {
+        const clean = `${location.origin}${location.pathname}`;
+        history.replaceState({}, '', clean);
+      }
+
+      viewingSharedCard = false;
+      sharedCardData = null;
+
+      applyCardData(DEFAULT_CARD);
+      loadMyCardSection();
+      alert('Reset to John Doe.');
     }
 
   </script>
