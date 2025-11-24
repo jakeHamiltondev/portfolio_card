@@ -1775,6 +1775,24 @@ function parsePrettyPhone10(p) {
 }
 
     /* ==========================================================
+       URL FIXER (ensure proper https://…)
+       ========================================================== */
+      function fixUrl(url) {
+        if (!url || !url.trim()) return '';
+      
+        url = url.trim();
+      
+        // If already has protocol, return as-is
+        if (/^https?:\/\//i.test(url)) {
+          return url;
+        }
+      
+        // Otherwise, add https://
+        return 'https://' + url;
+      }
+
+
+    /* ==========================================================
        SAVE SETTINGS (validate → persist → apply)
        ========================================================== */
 
@@ -1813,10 +1831,10 @@ function parsePrettyPhone10(p) {
         '#6B46C1'
       );
 
-      const certPage = document.getElementById('certPageInput').value;
-      const eduPage  = document.getElementById('eduPageInput').value;
-      const projPage = document.getElementById('projPageInput').value;
-      const refPage  = document.getElementById('refPageInput').value;
+      const certPage = fixURL(document.getElementById('certPageInput').value);
+      const eduPage  = fixURL(document.getElementById('eduPageInput').value);
+      const projPage = fixURL(document.getElementById('projPageInput').value);
+      const refPage  = fixURL(document.getElementById('refPageInput').value);
 
       const showCert = document.getElementById('showCertifications').checked;
       const showEdu  = document.getElementById('showEducation').checked;
@@ -2011,10 +2029,18 @@ function parsePrettyPhone10(p) {
     function openLink(event, type) {
       event.stopPropagation();
 
-      if (window.portfolioLinks && window.portfolioLinks[type]) {
+      const linkMap = {
+        cert: 'Certifications',
+        edu: 'Education',
+        proj: 'Projects',
+        ref: 'References'
+      };
+
+      if (window.portfolioLinks && window.portfolioLinks[type] && window.portfolioLinks[type].trim()) {
         window.open(window.portfolioLinks[type], '_blank');
       } else {
-        alert('No link available');
+        const itemName = linkMap[type] || 'This item';
+        alert(`No link set for ${itemName}. Add a URL in Settings to link to your portfolio.`);
       }
     }
 
@@ -2241,10 +2267,10 @@ function parsePrettyPhone10(p) {
 
         // Build only the visible buttons
         const items = [];
-        if (vis.cert !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'cert\')">Certifications</button>');
-        if (vis.edu !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'edu\')">Education</button>');
-        if (vis.proj !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'proj\')">Projects</button>');
-        if (vis.ref !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'ref\')">References</button>');
+        if (vis.cert !== false) items.push('<button class="portfolio-link" data-link-type="cert">Certifications</button>');
+        if (vis.edu !== false) items.push('<button class="portfolio-link" data-link-type="edu">Education</button>');
+        if (vis.proj !== false) items.push('<button class="portfolio-link" data-link-type="proj">Projects</button>');
+        if (vis.ref !== false) items.push('<button class="portfolio-link" data-link-type="ref">References</button>');
 
         const portfolioSection = document.querySelector('.portfolio-links');
         if (!portfolioSection) return;
@@ -2258,7 +2284,7 @@ function parsePrettyPhone10(p) {
         // Determine grid style based on item count
         let gridStyle = 'margin: 0 auto; display: grid; gap: 6px;';
         let gridHtml = '';
-        
+      
         switch (items.length) {
           case 1:
             gridStyle += 'grid-template-columns: 1fr; max-width: 140px;';
@@ -2291,6 +2317,28 @@ function parsePrettyPhone10(p) {
             ${gridHtml}
           </div>
         `;
+
+        // Add event listeners to all portfolio buttons
+        portfolioSection.querySelectorAll('.portfolio-link').forEach(button => {
+          button.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const type = this.getAttribute('data-link-type');
+          
+            const linkMap = {
+              cert: 'Certifications',
+              edu: 'Education',
+              proj: 'Projects',
+              ref: 'References'
+            };
+
+            if (window.portfolioLinks && window.portfolioLinks[type] && window.portfolioLinks[type].trim()) {
+              window.open(window.portfolioLinks[type], '_blank');
+            } else {
+              const itemName = linkMap[type] || 'This item';
+              alert(`No link set for ${itemName}. Add a URL in Settings to link to your portfolio.`);
+            }
+          });
+        });
       }
 
     /* ==========================================================
