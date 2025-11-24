@@ -2251,19 +2251,19 @@ function parsePrettyPhone10(p) {
         }
 
         // Determine grid style based on item count
-        let gridStyle = '';
+        let gridStyle = 'margin: 0 auto; ';
         switch (items.length) {
           case 1:
-            gridStyle = 'grid-template-columns: 1fr; max-width: 180px;';
+            gridStyle += 'grid-template-columns: 1fr; max-width: 180px;';
             break;
           case 2:
-            gridStyle = 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 260px;';
             break;
           case 3:
-            gridStyle = 'grid-template-columns: repeat(3, 1fr); max-width: 380px;';
+            gridStyle += 'grid-template-columns: repeat(3, 1fr); max-width: 380px;';
             break;
           default: // 4 items
-            gridStyle = 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 260px;';
         }
 
         portfolioSection.style.display = 'block';
