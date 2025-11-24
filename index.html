@@ -360,7 +360,12 @@
 
     .portfolio-link:hover {
       background: var(--card-chip-bg-hover, rgba(255, 255, 255, 0.3));
-      transform: translateX(5px);
+      transform: scale(1.05);
+    }
+
+    .portfolio-link:active {
+      background: var(--card-chip-bg-hover, rgba(255, 255, 255, 0.3));
+      transform: scale(0.95);
     }
 
     .right-content { display: none; }
