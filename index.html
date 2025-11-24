@@ -759,7 +759,7 @@
         align-items: center;
 
         /* small shift so it feels centered */
-        transform: translateX(40px);
+        /* transform: translateX(40px); */
       }
 
       .portfolio-links-grid { max-width: 220px; }
@@ -2251,19 +2251,19 @@ function parsePrettyPhone10(p) {
         }
 
         // Determine grid style based on item count
-        let gridStyle = 'margin: 0 auto; ';
+        let gridStyle = 'margin: 0 auto; display: grid; gap: 6px;';
         switch (items.length) {
           case 1:
-            gridStyle += 'grid-template-columns: 1fr; max-width: 180px;';
+            gridStyle += 'grid-template-columns: 1fr; max-width: 140px;';
             break;
           case 2:
-            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 200px;';
             break;
           case 3:
-            gridStyle += 'grid-template-columns: repeat(3, 1fr); max-width: 380px;';
+            gridStyle += 'grid-template-columns: repeat(3, 1fr); max-width: 280px;';
             break;
           default: // 4 items
-            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 200px;';
         }
 
         portfolioSection.style.display = 'block';
