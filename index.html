@@ -1109,6 +1109,29 @@
       <div class="section-title">PORTFOLIO LINKS</div>
 
       <div class="form-group">
+        <label>Portfolio Items to Display</label>
+        <p style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Select which portfolio items you want to show on your card</p>
+        <div id="portfolioVisibilityOptions" style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showCertifications" checked style="width: 18px; height: 18px; cursor: pointer;" />
+            <span>Certifications</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showEducation" checked style="width: 18px; height: 18px; cursor: pointer;" />
+            <span>Education</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showProjects" checked style="width: 18px; height: 18px; cursor: pointer;" />
+            <span>Projects</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showReferences" checked style="width: 18px; height: 18px; cursor: pointer;" />
+            <span>References</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>Certifications Page URL</label>
         <input type="text" id="certPageInput" value="" placeholder="https://example.com/certifications" />
       </div>
@@ -1182,6 +1205,7 @@
       bgColor: '#6B46C1',
       profilePic: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
       portfolioLinks: { cert: '', edu: '', proj: '', ref: '' },
+      portfolioVisibility: { cert: true, edu: true, proj: true, ref: true},
       lastUpdated: ''
     };
 
@@ -1274,6 +1298,7 @@
         bgColor:   raw.bgColor,
         profilePic: raw.profilePic,        // include image so recipients see your face
         portfolioLinks: raw.portfolioLinks || {},
+        portfolioVisibility: raw.portfolioVisibility || { cert: true, edu: true, proj: true, ref: true },
       };
     }
 
@@ -1788,6 +1813,11 @@ function parsePrettyPhone10(p) {
       const projPage = document.getElementById('projPageInput').value;
       const refPage  = document.getElementById('refPageInput').value;
 
+      const showCert = document.getElementById('showCertifications').checked;
+      const showEdu  = document.getElementById('showEducation').checked;
+      const showProj = document.getElementById('showProjects').checked;
+      const showRef  = document.getElementById('showReferences').checked;
+
       let profilePicData = uploadedImageData || document.getElementById('profilePic').src;
       const f = formatPhone(cc, local);
 
@@ -1805,6 +1835,7 @@ function parsePrettyPhone10(p) {
         bgColor,
         profilePic: profilePicData,
         portfolioLinks: { cert: certPage, edu: eduPage, proj: projPage, ref: refPage },
+        portfolioVisibility: { cert: showCert, edu: showEdu, proj: showProj, ref: showRef },
         lastUpdated: new Date().toISOString()
       };
 
@@ -2183,11 +2214,66 @@ function parsePrettyPhone10(p) {
         const ALLOWED_COUNTRY_CODES_LOCAL = ['1', '44', '61', '81', '91', '353'];
         ccSel.value = (cc && ALLOWED_COUNTRY_CODES_LOCAL.includes(cc)) ? cc : '';
         localIn.value = local ? local.replace(/\D+/g, '').slice(0, 10) : '';
+      
+
+        // load visibility checkboxes
+        const vis = cardData.portfolioVisibility || { cert: true, edu: true, proj: true, ref: true };
+        document.getElementById('showCertifications').checked = vis.cert !== false;
+        document.getElementById('showEducation').checked = vis.edu !== false;
+        document.getElementById('showProjects').checked = vis.proj !== false;
+        document.getElementById('showReferences').checked = vis.ref !== false;
       }
 
-      // stash links so the portfolio buttons know where to go
-      window.portfolioLinks = cardData.portfolioLinks;
-    }
+        // stash links so the portfolio buttons know where to go
+        window.portfolioLinks = cardData.portfolioLinks;
+
+        // render portfolio section based on visibility
+        renderPortfolioSection(cardData);
+      }
+
+      function renderPortfolioSection(cardData) {
+        const vis = cardData.portfolioVisibility || { cert: true, edu: true, proj: true, ref: true };
+
+        // Build only the visible buttons
+        const items = [];
+        if (vis.cert !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'cert\')">Certifications</button>');
+        if (vis.edu !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'edu\')">Education</button>');
+        if (vis.proj !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'proj\')">Projects</button>');
+        if (vis.ref !== false) items.push('<button class="portfolio-link" onclick="openLink(event, \'ref\')">References</button>');
+
+        const portfolioSection = document.querySelector('.portfolio-links');
+        if (!portfolioSection) return;
+
+        // Hide entire section if no items selected
+        if (items.length === 0) {
+          portfolioSection.style.display = 'none';
+          return;
+        }
+
+        // Determine grid style based on item count
+        let gridStyle = '';
+        switch (items.length) {
+          case 1:
+            gridStyle = 'grid-template-columns: 1fr; max-width: 180px;';
+            break;
+          case 2:
+            gridStyle = 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+            break;
+          case 3:
+            gridStyle = 'grid-template-columns: repeat(3, 1fr); max-width: 380px;';
+            break;
+          default: // 4 items
+            gridStyle = 'grid-template-columns: 1fr 1fr; max-width: 260px;';
+        }
+
+        portfolioSection.style.display = 'block';
+        portfolioSection.innerHTML = `
+          <h3>PORTFOLIO</h3>
+          <div class="portfolio-links-grid" style="${gridStyle}">
+            ${items.join('')}
+          </div>
+        `;
+      }
 
     /* ==========================================================
        RESET to John Doe (clear local data, remove ?card=)
