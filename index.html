@@ -2252,25 +2252,38 @@ function parsePrettyPhone10(p) {
 
         // Determine grid style based on item count
         let gridStyle = 'margin: 0 auto; display: grid; gap: 6px;';
+        let gridHtml = '';
+        
         switch (items.length) {
           case 1:
             gridStyle += 'grid-template-columns: 1fr; max-width: 140px;';
+            gridHtml = items.join('');
             break;
           case 2:
             gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 200px;';
+            gridHtml = items.join('');
             break;
           case 3:
-            gridStyle += 'grid-template-columns: repeat(3, 1fr); max-width: 280px;';
+            // 2 on top, 1 centered below
+            gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 200px;';
+            gridHtml = `
+              ${items[0]}
+              ${items[1]}
+              <div style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                ${items[2]}
+              </div>
+            `;
             break;
           default: // 4 items
             gridStyle += 'grid-template-columns: 1fr 1fr; max-width: 200px;';
+            gridHtml = items.join('');
         }
 
         portfolioSection.style.display = 'block';
         portfolioSection.innerHTML = `
           <h3>PORTFOLIO</h3>
           <div class="portfolio-links-grid" style="${gridStyle}">
-            ${items.join('')}
+            ${gridHtml}
           </div>
         `;
       }
