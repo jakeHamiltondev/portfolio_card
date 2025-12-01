@@ -1339,8 +1339,15 @@
       </div>
 
       <div class="form-group">
-        <label>Resume URL</label>
-        <input type="text" id="resumePageInput" value="" placeholder="https://example.com/resume.pdf" />
+        <label>Resume URL - PDF Format</label>
+        <input type="text" id="resumePdfInput" value="" placeholder="https://example.com/resume.pdf" />
+        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Link to your resume in PDF format</p>
+      </div>
+
+      <div class="form-group">
+        <label>Resume URL - DOCX Format</label>
+        <input type="text" id="resumeDocxInput" value="" placeholder="https://example.com/resume.docx" />
+        <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">Link to your resume in Word format (optional)</p>
       </div>
 
       <div class="form-group">
@@ -1405,7 +1412,7 @@
       cardColor: '#6366f1',
       bgColor: '#6B46C1',
       profilePic: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-      portfolioLinks: { cert: '', edu: '', proj: '', ref: '', resume: '', work: '' },
+      portfolioLinks: { cert: '', edu: '', proj: '', ref: '', resume: { pdf: '', docx: '' }, work: '' },
       portfolioVisibility: { cert: true, edu: true, proj: true, ref: true, resume: true, work: true },
       lastUpdated: ''
     };
@@ -1516,6 +1523,15 @@
      * @returns {Object} Sanitized card data for sharing
      */
     function buildShareObj(cardData) {
+      // Ensure resume is properly structured
+      let resumeData = cardData.portfolioLinks?.resume;
+      if (typeof resumeData === 'string') {
+        // Backward compatibility: convert old string format to new object format
+        resumeData = { pdf: resumeData, docx: '' };
+      } else if (!resumeData) {
+        resumeData = { pdf: '', docx: '' };
+      }
+
       return {
         firstName: cardData.firstName,
         lastName: cardData.lastName,
@@ -1527,8 +1543,13 @@
         cardColor: cardData.cardColor,
         bgColor: cardData.bgColor,
         profilePic: cardData.profilePic,
-        portfolioLinks: cardData.portfolioLinks || {},
-        portfolioVisibility: cardData.portfolioVisibility || { cert: true, edu: true, proj: true, ref: true, resume: true, work: true }
+        portfolioLinks: {
+          ...cardData.portfolioLinks,
+          resume: resumeData
+        },
+        portfolioVisibility: cardData.portfolioVisibility || { 
+          cert: true, edu: true, proj: true, ref: true, resume: true, work: true 
+        }
       };
     }
 
@@ -2335,16 +2356,17 @@
       const eduPage = fixUrl(document.getElementById('eduPageInput').value);
       const projPage = fixUrl(document.getElementById('projPageInput').value);
       const refPage = fixUrl(document.getElementById('refPageInput').value);
-      const resumePage = fixUrl(document.getElementById('resumePageInput').value);  
-      const workPage = fixUrl(document.getElementById('workPageInput').value);      
+      const resumePdfPage = fixUrl(document.getElementById('resumePdfInput').value);
+      const resumeDocxPage = fixUrl(document.getElementById('resumeDocxInput').value);
+      const workPage = fixUrl(document.getElementById('workPageInput').value);
 
       // Get portfolio visibility settings
       const showCert = document.getElementById('showCertifications').checked;
       const showEdu = document.getElementById('showEducation').checked;
       const showProj = document.getElementById('showProjects').checked;
       const showRef = document.getElementById('showReferences').checked;
-      const showResume = document.getElementById('showResume').checked;             
-      const showWork = document.getElementById('showWork').checked;                 
+      const showResume = document.getElementById('showResume').checked;
+      const showWork = document.getElementById('showWork').checked;
 
       // Get profile picture (uploaded or existing)
       let profilePicData = uploadedImageData || document.getElementById('profilePic').src;
@@ -2354,24 +2376,27 @@
 
       // Build card data object
       const cardData = {
-        firstName,
-        lastName,
-        jobTitle,
-        email,
+        firstName: firstName,
+        lastName: lastName,
+        jobTitle: jobTitle,
+        email: email,
         phone: formattedPhone.pretty,
         phoneE164: formattedPhone.e164,
         countryCode: countryCode,
         localNumber: localNumber,
-        linkedin,
-        cardColor,
-        bgColor,
+        linkedin: linkedin,
+        cardColor: cardColor,
+        bgColor: bgColor,
         profilePic: profilePicData,
         portfolioLinks: {
           cert: certPage,
           edu: eduPage,
           proj: projPage,
           ref: refPage,
-          resume: resumePage,
+          resume: {
+            pdf: resumePdfPage,
+            docx: resumeDocxPage
+          },
           work: workPage
         },
         portfolioVisibility: {
@@ -2694,7 +2719,7 @@
       ['click', 'touchstart'].forEach(eventType => {
         cardRoot.addEventListener(eventType, (event) => {
           if (event.target.closest(NON_FLIP_SELECTORS)) {
-            event.stopPropagation();
+            return;
           }
         }, { capture: true });
       });
@@ -2788,12 +2813,26 @@
 
         // Portfolio URLs
         const portfolioLinks = cardData.portfolioLinks || {};
+
+        // Handle resume - support both old string format and new object format
+        let resumeData = portfolioLinks.resume;
+        if (typeof resumeData === 'string') {
+          // Backward compatibility
+          document.getElementById('resumePdfInput').value = resumeData;
+          document.getElementById('resumeDocxInput').value = '';
+        } else if (resumeData && typeof resumeData === 'object') {
+          document.getElementById('resumePdfInput').value = resumeData.pdf || '';
+          document.getElementById('resumeDocxInput').value = resumeData.docx || '';
+        } else {
+          document.getElementById('resumePdfInput').value = '';
+          document.getElementById('resumeDocxInput').value = '';
+        }
+
         document.getElementById('certPageInput').value = portfolioLinks.cert || '';
         document.getElementById('eduPageInput').value = portfolioLinks.edu || '';
         document.getElementById('projPageInput').value = portfolioLinks.proj || '';
         document.getElementById('refPageInput').value = portfolioLinks.ref || '';
-        document.getElementById('resumePageInput').value = portfolioLinks.resume || '';  
-        document.getElementById('workPageInput').value = portfolioLinks.work || '';       
+        document.getElementById('workPageInput').value = portfolioLinks.work || '';     
 
         // Phone number fields
         const countryCodeSelect = document.getElementById('countryCodeSelect');
@@ -2832,7 +2871,17 @@
       }
 
       // Store portfolio links globally for button handlers
-      window.portfolioLinks = cardData.portfolioLinks;
+      const portfolioLinks = cardData.portfolioLinks || {};
+      if (portfolioLinks.resume && typeof portfolioLinks.resume === 'string') {
+        // Convert old string format to new object format
+        portfolioLinks.resume = { pdf: portfolioLinks.resume, docx: '' };
+      } else if (!portfolioLinks.resume) {
+        // Ensure resume exists as an object
+        portfolioLinks.resume = { pdf: '', docx: '' };
+      }
+      window.portfolioLinks = portfolioLinks;
+
+      console.log('✅ Set window.portfolioLinks:', window.portfolioLinks); // Debug line
 
       // Render portfolio section with visibility settings
       renderPortfolioSection(cardData);
@@ -2985,18 +3034,56 @@
             work: 'Work Experience'
           };
 
-          // Get URL for this portfolio type
+          // Special handling for resume with multiple formats
+          if (type === 'resume') {
+            const resumeData = window.portfolioLinks && window.portfolioLinks.resume;
+            let pdfUrl = '';
+            let docxUrl = '';
+
+            // Handle both old string format and new object format
+            if (typeof resumeData === 'string') {
+              pdfUrl = resumeData.trim();
+            } else if (resumeData && typeof resumeData === 'object') {
+              pdfUrl = (resumeData.pdf || '').trim();
+              docxUrl = (resumeData.docx || '').trim();
+            }
+
+            // If both formats available, let user choose
+            if (pdfUrl && docxUrl) {
+              const choice = confirm(
+                'Choose your preferred format:\n\n' +
+                'OK = PDF\n' +
+                'Cancel = Word (DOCX)'
+              );
+              const urlToOpen = choice ? pdfUrl : docxUrl;
+              window.open(urlToOpen, '_blank');
+              return;
+            }
+
+            // If only one format available, open it
+            const url = pdfUrl || docxUrl;
+            if (url) {
+              window.open(url, '_blank');
+            } else {
+              const itemName = linkMap[type] || 'This item';
+              if (viewingSharedCard) {
+                alert(`No ${itemName} link available for this contact.`);
+              } else {
+                alert(`No link set for ${itemName}.\n\nAdd a URL in Settings to link to your portfolio.`);
+              }
+            }
+            return;
+          }
+
+          // Handle all other portfolio types normally
           const url = window.portfolioLinks && window.portfolioLinks[type] 
             ? window.portfolioLinks[type].trim() 
             : '';
 
           if (url) {
-            // Open URL in new tab
             window.open(url, '_blank');
           } else {
-            // Show appropriate message based on viewing mode
             const itemName = linkMap[type] || 'This item';
-
             if (viewingSharedCard) {
               alert(`No ${itemName} link available for this contact.`);
             } else {
@@ -3006,7 +3093,7 @@
         });
       });
     }
-
+  
     /* ==========================================================
        RESET TO DEFAULT
        Clear saved data and reset to John Doe template
