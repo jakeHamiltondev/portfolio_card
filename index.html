@@ -6,6 +6,8 @@
   <title>Digital Portfolio Card</title>
 
   <link rel="stylesheet" href="css/styles.css" />
+
+  <script src="js/config.js"></script>
 </head>
 
 <body>
@@ -418,25 +420,6 @@
 
     // Temporary storage for image uploads before saving
     let uploadedImageData = null;
-
-    // Default card data (John Doe template)
-    const DEFAULT_CARD = {
-      firstName: 'John',
-      lastName: 'Doe',
-      jobTitle: 'Student',
-      email: 'john.doe@email.com',
-      phone: '+1 (555)-123-4567',
-      phoneE164: '+15551234567',
-      countryCode: '1',
-      localNumber: '5551234567',
-      linkedin: 'https://linkedin.com/in/johndoe',
-      cardColor: '#6366f1',
-      bgColor: '#6B46C1',
-      profilePic: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-      portfolioLinks: { cert: '', edu: '', proj: '', ref: '', resume: { pdf: '', docx: '' }, work: '' },
-      portfolioVisibility: { cert: true, edu: true, proj: true, ref: true, resume: true, work: true },
-      lastUpdated: ''
-    };
 
     /* ==========================================================
        INITIALIZATION
@@ -1208,9 +1191,6 @@
        PHONE NUMBER HANDLING
        Format and validate phone numbers with country codes
        ========================================================== */
-
-    // Allowed country codes
-    const ALLOWED_COUNTRY_CODES = ['1', '44', '61', '81', '91', '353'];
 
     /**
      * Initialize phone number input filter (digits only, max 10)
