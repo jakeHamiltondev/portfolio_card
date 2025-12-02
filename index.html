@@ -9,6 +9,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
 </head>
 
 <body>
@@ -486,10 +487,9 @@
     function loadMyCard() {
       viewingSharedCard = false;
 
-      const myCard = localStorage.getItem('myCard');
+      const cardData = getMyCard();
 
-      if (myCard) {
-        const cardData = JSON.parse(myCard);
+      if (cardData) {
         applyCardData(cardData);
       } else {
         // No saved card, use default template
@@ -634,7 +634,7 @@
      * Open the share panel (QR code generation)
      */
     function openShare() {
-      const myCard = localStorage.getItem('myCard');
+      const myCard = getMyCard();
       if (!myCard) {
         alert('Please create your card in Settings first!');
         return;
@@ -701,7 +701,7 @@
      * Shows empty state if no card exists
      */
     function loadMyCardSection() {
-      const myCard = localStorage.getItem('myCard');
+      const myCard = getMyCard();
       const section = document.getElementById('myCardSection');
 
       if (!myCard) {
@@ -719,10 +719,8 @@
         return;
       }
 
-      const card = JSON.parse(myCard);
-
       // Calculate colors for styling
-      const accent = card.cardColor || '#6366f1';
+      const accent = myCard.cardColor || '#6366f1';
       const text = textOn(accent);
       const chipBg = text === '#ffffff' 
         ? 'rgba(255,255,255,0.2)' 
@@ -732,9 +730,9 @@
       const borderColor = _lum(accent) < 0.45 ? '#ffffff' : '#111827';
 
       // Build name line with optional job title
-      const nameLine = (card.jobTitle && card.jobTitle.trim())
-        ? `${card.firstName} ${card.lastName} - ${card.jobTitle}`
-        : `${card.firstName} ${card.lastName}`;
+      const nameLine = (myCard.jobTitle && myCard.jobTitle.trim())
+        ? `${myCard.firstName} ${myCard.lastName} - ${myCard.jobTitle}`
+        : `${myCard.firstName} ${myCard.lastName}`;
 
       // Render card preview
       section.innerHTML = `
@@ -742,12 +740,12 @@
           <h3 style="color:${text}">My Business Card</h3>
 
           <div class="my-card-preview">
-            <img src="${card.profilePic}" alt="${card.firstName}" class="my-card-pic">
+            <img src="${myCard.profilePic}" alt="${myCard.firstName}" class="my-card-pic">
 
             <div class="my-card-details">
               <h4 style="color:${text}">${nameLine}</h4>
-              <p style="color:${text}">${card.email}</p>
-              <p style="color:${text}">${card.phone || ''}</p>
+              <p style="color:${text}">${myCard.email}</p>
+              <p style="color:${text}">${myCard.phone || ''}</p>
             </div>
           </div>
 
@@ -775,7 +773,7 @@
      * Shows empty state if no contacts saved
      */
     function loadContacts() {
-      const contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
+      const contacts = getSavedContacts();
       const grid = document.getElementById('contactsGrid');
 
       if (contacts.length === 0) {
@@ -823,27 +821,12 @@
     function saveContact() {
       if (!sharedCardData) return;
 
-      let contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
+      const success = addContact(sharedCardData);
 
-      // Check for duplicates
-      const exists = contacts.some(c =>
-        c.firstName === sharedCardData.firstName &&
-        c.lastName === sharedCardData.lastName &&
-        c.email === sharedCardData.email
-      );
-
-      if (exists) {
+      if (!success) {
         alert('This contact is already in your collection!');
         return;
       }
-
-      // Add to contacts with timestamp
-      contacts.push({
-        ...sharedCardData,
-        savedAt: new Date().toISOString()
-      });
-
-      localStorage.setItem('savedContacts', JSON.stringify(contacts));
 
       alert(`${sharedCardData.firstName} ${sharedCardData.lastName}'s card saved to your contacts!`);
       document.getElementById('saveContactBtn').classList.remove('show');
@@ -854,7 +837,7 @@
      * @param {number} index - Index of contact in saved contacts array
      */
     function viewContact(index) {
-      const contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
+      const contacts = getSavedContacts();
       const contact = contacts[index];
 
       if (contact) {
@@ -870,10 +853,7 @@
     function deleteContact(index) {
       if (!confirm('Remove this contact?')) return;
 
-      let contacts = JSON.parse(localStorage.getItem('savedContacts') || '[]');
-      contacts.splice(index, 1);
-      localStorage.setItem('savedContacts', JSON.stringify(contacts));
-
+      removeContact(index);
       loadContacts();
     }
 
@@ -1097,12 +1077,7 @@
         lastUpdated: new Date().toISOString()
       };
 
-      // Save to localStorage
-      try {
-        localStorage.setItem('myCard', JSON.stringify(cardData));
-      } catch (error) {
-        console.error('Failed to save card:', error);
-        alert('Could not save your card (storage full). Try reducing image size.');
+      if (!saveMyCard(cardData)) {
         return;
       }
 
@@ -1113,8 +1088,8 @@
       // Clear temporary upload data
       uploadedImageData = null;
 
-      closeSettings();
       alert('Your card has been saved!');
+      closeSettings();
     }
 
     /* ==========================================================
@@ -1127,14 +1102,13 @@
      * Creates shareable URL and renders QR code image
      */
     function generateQRCode() {
-      const myCard = localStorage.getItem('myCard');
+      const rawCard = getMyCard();
       const qrContainer = document.getElementById('qrcode');
       const warningsDiv = document.getElementById('qrWarnings');
 
-      if (!myCard || !qrContainer) return;
+      if (!rawCard || !qrContainer) return;
 
       // Build share object (exclude large data)
-      const rawCard = JSON.parse(myCard);
       const shareObj = buildShareObj(rawCard);
       const encodedCard = encodeObj(shareObj);
 
@@ -1245,10 +1219,9 @@
      * @returns {string} Complete shareable URL
      */
     function buildShareUrlFromUI() {
-      const myCard = localStorage.getItem('myCard');
-      if (!myCard) return `${location.origin}${location.pathname}`;
+      const rawCard = getMyCard();
+      if (!rawCard) return `${location.origin}${location.pathname}`;
 
-      const rawCard = JSON.parse(myCard);
       const shareObj = buildShareObj(rawCard);
       const encodedCard = encodeObj(shareObj);
 
@@ -1466,7 +1439,7 @@
       document.getElementById('cardFront').style.background = 
         `linear-gradient(135deg, ${cardColor} 0%, ${cardColor} 50%, ${cardColor} 100%)`;
       document.getElementById('cardBack').style.background = cardColor;
-
+      
       // Calculate text colors for contrast
       const textColor = contrastColor(cardColor);
       const chipBg = textColor === '#ffffff' 
@@ -1795,11 +1768,7 @@
         return;
       }
 
-      try {
-        localStorage.removeItem('myCard');
-      } catch (error) {
-        console.error('Failed to clear card data:', error);
-      }
+      removeMyCard();
 
       // Remove ?card= parameter from URL
       if (location.search.includes('card=')) {
