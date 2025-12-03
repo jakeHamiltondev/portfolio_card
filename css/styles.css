@@ -946,6 +946,7 @@ body {
   flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 .crop-modal.active {
@@ -965,6 +966,9 @@ body {
   cursor: move;
   margin-bottom: 30px;
   background: #1f2937;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .crop-image {
@@ -972,6 +976,8 @@ body {
   max-width: none;
   user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
+  pointer-events: none;
 }
 
 .crop-controls {
@@ -1078,6 +1084,14 @@ body {
   margin-bottom: 10px;
 }
 
+/* Prevent pull-to-refresh on mobile when using crop tool */
+body.cropping {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
 @media (max-width: 768px) {
   .crop-container {
     width: 300px;
@@ -1086,5 +1100,14 @@ body {
   
   .crop-controls {
     max-width: 300px;
+  }
+  
+  .crop-instructions {
+    font-size: 12px;
+  }
+  
+  .crop-btn {
+    padding: 12px 20px;
+    font-size: 14px;
   }
 }

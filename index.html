@@ -1339,6 +1339,7 @@
       
       // Show modal
       modal.classList.add('active');
+      document.body.classList.add('cropping');
       
       // Setup event listeners
       setupCropListeners();
@@ -1390,29 +1391,33 @@
         cropState.isDragging = false;
       };
       
-      // Touch drag
-      container.ontouchstart = function(e) {
-        e.preventDefault();
+      // Touch drag (improved for mobile)
+      container.addEventListener('touchstart', function(e) {
         const touch = e.touches[0];
         cropState.isDragging = true;
         cropState.dragStart = {
           x: touch.clientX - cropState.position.x,
           y: touch.clientY - cropState.position.y
         };
-      };
+        e.preventDefault(); // Prevent scrolling while dragging
+      }, { passive: false });
       
-      document.ontouchmove = function(e) {
+      document.addEventListener('touchmove', function(e) {
         if (cropState.isDragging) {
+          e.preventDefault(); // Prevent scrolling while dragging
           const touch = e.touches[0];
           cropState.position.x = touch.clientX - cropState.dragStart.x;
           cropState.position.y = touch.clientY - cropState.dragStart.y;
           updateCropImagePosition();
         }
-      };
+      }, { passive: false });
       
-      document.ontouchend = function() {
-        cropState.isDragging = false;
-      };
+      document.addEventListener('touchend', function(e) {
+        if (cropState.isDragging) {
+          e.preventDefault();
+          cropState.isDragging = false;
+        }
+      }, { passive: false });
       
       // Zoom slider
       zoomSlider.oninput = function() {
@@ -1447,6 +1452,7 @@
     function cancelCrop() {
       const modal = document.getElementById('cropModal');
       modal.classList.remove('active');
+      document.body.classList.remove('cropping');
       
       // Clear file input
       document.getElementById('profilePicInput').value = '';
