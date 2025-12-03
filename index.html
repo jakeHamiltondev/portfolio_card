@@ -1000,7 +1000,12 @@
 
       // Build share object (exclude large data)
       const shareObj = buildShareObj(rawCard);
-      const encodedCard = encodeObj(shareObj);
+
+      const qrShareObj = { 
+        ...shareObj,
+      profilePic: '' };
+
+      const encodedCard = encodeObj(qrShareObj);
 
       // Build share URL
       let baseUrl = `${location.origin}${location.pathname}`;
@@ -1044,11 +1049,11 @@
       }
 
       // Check if payload is too large for QR code
-      if (encodedCard.length > 2000) {
+      if (encodedCard.length > 4000) {
         qrContainer.innerHTML = `
           <div style="padding:20px;text-align:center;">
             <p style="color:#6b7280;margin-bottom:12px;">
-              Link is too long for QR code. Use copy/open instead:
+              QR code generation failed. Use Copy Link or Open Link buttons below:
             </p>
             <div style="background:#f3f4f6;padding:12px;border-radius:8px;word-break:break-all;
                         font-size:11px;font-family:monospace;margin-bottom:12px;">
