@@ -297,3 +297,80 @@ function fixUrl(url) {
   // Add https://
   return 'https://' + url;
 }
+
+/**
+ * Copy text to clipboard with user feedback
+ * @param {string} text - Text to copy
+ * @param {string} label - Label for feedback message (e.g., "Email", "Phone")
+ */
+function copyToClipboard(text, label) {
+  // Try modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        showCopyFeedback(`${label} copied!`);
+      })
+      .catch(() => {
+        // Fallback to older method
+        fallbackCopy(text, label);
+      });
+  } else {
+    // Use fallback for older browsers
+    fallbackCopy(text, label);
+  }
+}
+
+/**
+ * Fallback copy method for older browsers
+ * @param {string} text - Text to copy
+ * @param {string} label - Label for feedback message
+ */
+function fallbackCopy(text, label) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  
+  try {
+    document.execCommand('copy');
+    showCopyFeedback(`${label} copied!`);
+  } catch (err) {
+    showCopyFeedback(`Could not copy ${label.toLowerCase()}`);
+  }
+  
+  document.body.removeChild(textarea);
+}
+
+/**
+ * Show temporary feedback message
+ * @param {string} message - Message to display
+ */
+function showCopyFeedback(message) {
+  // Create feedback element
+  const feedback = document.createElement('div');
+  feedback.textContent = message;
+  feedback.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    z-index: 10001;
+    animation: fadeInOut 2s ease-in-out;
+    pointer-events: none;
+  `;
+  
+  document.body.appendChild(feedback);
+  
+  // Remove after animation
+  setTimeout(() => {
+    document.body.removeChild(feedback);
+  }, 2000);
+}

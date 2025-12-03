@@ -94,9 +94,15 @@ function applyCardData(cardData) {
   document.getElementById('phoneText').textContent = prettyPhone || '';
   document.getElementById('phoneLink').href = e164Phone ? 'tel:' + e164Phone : '#';
 
-  // Update email
+  // Update email with copy-to-clipboard functionality
+  const emailLink = document.getElementById('emailLink');
+  emailLink.href = '#';
+  emailLink.onclick = function(e) {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent card flip
+    copyToClipboard(cardData.email, 'Email');
+  };
   document.getElementById('emailText').textContent = cardData.email;
-  document.getElementById('emailLink').href = 'mailto:' + cardData.email;
 
   // Update images
   document.getElementById('profilePic').src = cardData.profilePic;
