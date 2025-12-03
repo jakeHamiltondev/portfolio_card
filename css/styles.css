@@ -927,3 +927,164 @@ body {
     height: 135px;
   }
 }
+
+/* =================================
+   IMAGE CROP MODAL
+   ================================= */
+
+.crop-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.crop-modal.active {
+  display: flex;
+}
+
+.crop-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  max-width: 90vw;
+  max-height: 50vh;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 3px solid #6366f1;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  cursor: move;
+  margin-bottom: 30px;
+  background: #1f2937;
+}
+
+.crop-image {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.crop-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  color: white;
+}
+
+.zoom-control label {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.zoom-slider {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #374151;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #6366f1;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.zoom-slider::-webkit-slider-thumb:hover {
+  background: #4f46e5;
+}
+
+.zoom-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #6366f1;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.zoom-slider::-moz-range-thumb:hover {
+  background: #4f46e5;
+}
+
+.crop-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.crop-btn {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.crop-btn-save {
+  background: #6366f1;
+  color: white;
+}
+
+.crop-btn-save:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+.crop-btn-cancel {
+  background: #374151;
+  color: white;
+}
+
+.crop-btn-cancel:hover {
+  background: #4b5563;
+}
+
+.crop-instructions {
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .crop-container {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .crop-controls {
+    max-width: 300px;
+  }
+}

@@ -1257,86 +1257,264 @@
     }
 
     /* ==========================================================
-       IMAGE UPLOAD HANDLER
-       Handle profile picture uploads
+       IMAGE CROP FUNCTIONALITY
+       Allow users to position and zoom their profile picture
        ========================================================== */
 
+    let cropState = {
+      originalImage: null,
+      scale: 1,
+      position: { x: 0, y: 0 },
+      isDragging: false,
+      dragStart: { x: 0, y: 0 }
+    };
+
     /**
-     * Initialize profile picture upload handler
+     * Initialize profile picture upload handler with crop tool
      */
-    /**
-    * Initialize profile picture upload handler with compression
-    */
     document.getElementById('profilePicInput').addEventListener('change', function(event) {
       if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
         
-        // Check file size (warn if > 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-          console.warn('Large image detected, will compress...');
+        // Check file size
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Image is too large. Please choose an image under 5MB.');
+          return;
         }
 
         const fileReader = new FileReader();
 
         fileReader.onload = function(loadEvent) {
-          const img = new Image();
+          // Store original image
+          cropState.originalImage = loadEvent.target.result;
           
-          img.onload = function() {
-            // Create canvas for resizing
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set maximum dimensions (larger dimension = 800px)
-            const MAX_SIZE = 800;
-            let width = img.width;
-            let height = img.height;
-            
-            // Calculate new dimensions maintaining aspect ratio
-            if (width > height) {
-              if (width > MAX_SIZE) {
-                height = (height * MAX_SIZE) / width;
-                width = MAX_SIZE;
-              }
-            } else {
-              if (height > MAX_SIZE) {
-                width = (width * MAX_SIZE) / height;
-                height = MAX_SIZE;
-              }
-            }
-            
-            // Set canvas size
-            canvas.width = width;
-            canvas.height = height;
-            
-            // Draw resized image
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Convert to base64 with compression (0.85 quality)
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            
-            // Calculate size reduction
-            const originalSize = loadEvent.target.result.length;
-            const compressedSize = compressedDataUrl.length;
-            const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
-            
-            console.log(`Image compressed: ${(originalSize/1024).toFixed(0)}KB → ${(compressedSize/1024).toFixed(0)}KB (${reduction}% reduction)`);
-            
-            // Store compressed image
-            uploadedImageData = compressedDataUrl;
-            
-            // Update all image previews
-            document.getElementById('previewPic').src = compressedDataUrl;
-            document.getElementById('profilePic').src = compressedDataUrl;
-            document.getElementById('profilePicSmall').src = compressedDataUrl;
-          };
-          
-          // Load the image
-          img.src = loadEvent.target.result;
+          // Open crop modal
+          openCropModal(cropState.originalImage);
         };
 
         fileReader.readAsDataURL(file);
       }
     });
+
+    /**
+     * Open the crop modal with the uploaded image
+     */
+    function openCropModal(imageDataUrl) {
+      const modal = document.getElementById('cropModal');
+      const cropImage = document.getElementById('cropImage');
+      const zoomSlider = document.getElementById('zoomSlider');
+      
+      // Reset crop state
+      cropState.scale = 1;
+      cropState.position = { x: 0, y: 0 };
+      cropState.isDragging = false;
+      
+      // Load image
+      cropImage.src = imageDataUrl;
+      
+      // Wait for image to load to get dimensions
+      cropImage.onload = function() {
+        const container = document.getElementById('cropContainer');
+        const containerSize = Math.min(container.clientWidth, container.clientHeight);
+        
+        // Calculate initial scale to fit image in container
+        const imageAspect = cropImage.naturalWidth / cropImage.naturalHeight;
+        
+        if (imageAspect > 1) {
+          // Landscape
+          cropImage.style.height = containerSize + 'px';
+          cropImage.style.width = (containerSize * imageAspect) + 'px';
+        } else {
+          // Portrait or square
+          cropImage.style.width = containerSize + 'px';
+          cropImage.style.height = (containerSize / imageAspect) + 'px';
+        }
+        
+        // Center image
+        centerCropImage();
+      };
+      
+      // Reset zoom slider
+      zoomSlider.value = 100;
+      
+      // Show modal
+      modal.classList.add('active');
+      
+      // Setup event listeners
+      setupCropListeners();
+    }
+
+    /**
+     * Center the crop image in the container
+     */
+    function centerCropImage() {
+      const container = document.getElementById('cropContainer');
+      const image = document.getElementById('cropImage');
+      
+      const containerRect = container.getBoundingClientRect();
+      const imageRect = image.getBoundingClientRect();
+      
+      cropState.position.x = (containerRect.width - imageRect.width) / 2;
+      cropState.position.y = (containerRect.height - imageRect.height) / 2;
+      
+      updateCropImagePosition();
+    }
+
+    /**
+     * Setup drag and zoom event listeners
+     */
+    function setupCropListeners() {
+      const container = document.getElementById('cropContainer');
+      const image = document.getElementById('cropImage');
+      const zoomSlider = document.getElementById('zoomSlider');
+      
+      // Mouse drag
+      container.onmousedown = function(e) {
+        e.preventDefault();
+        cropState.isDragging = true;
+        cropState.dragStart = {
+          x: e.clientX - cropState.position.x,
+          y: e.clientY - cropState.position.y
+        };
+      };
+      
+      document.onmousemove = function(e) {
+        if (cropState.isDragging) {
+          cropState.position.x = e.clientX - cropState.dragStart.x;
+          cropState.position.y = e.clientY - cropState.dragStart.y;
+          updateCropImagePosition();
+        }
+      };
+      
+      document.onmouseup = function() {
+        cropState.isDragging = false;
+      };
+      
+      // Touch drag
+      container.ontouchstart = function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        cropState.isDragging = true;
+        cropState.dragStart = {
+          x: touch.clientX - cropState.position.x,
+          y: touch.clientY - cropState.position.y
+        };
+      };
+      
+      document.ontouchmove = function(e) {
+        if (cropState.isDragging) {
+          const touch = e.touches[0];
+          cropState.position.x = touch.clientX - cropState.dragStart.x;
+          cropState.position.y = touch.clientY - cropState.dragStart.y;
+          updateCropImagePosition();
+        }
+      };
+      
+      document.ontouchend = function() {
+        cropState.isDragging = false;
+      };
+      
+      // Zoom slider
+      zoomSlider.oninput = function() {
+        const newScale = this.value / 100;
+        const scaleDiff = newScale / cropState.scale;
+        
+        // Adjust position to zoom from center
+        const container = document.getElementById('cropContainer');
+        const centerX = container.clientWidth / 2;
+        const centerY = container.clientHeight / 2;
+        
+        cropState.position.x = centerX - (centerX - cropState.position.x) * scaleDiff;
+        cropState.position.y = centerY - (centerY - cropState.position.y) * scaleDiff;
+        
+        cropState.scale = newScale;
+        updateCropImagePosition();
+      };
+    }
+
+    /**
+     * Update crop image position and scale
+     */
+    function updateCropImagePosition() {
+      const image = document.getElementById('cropImage');
+      image.style.transform = `translate(${cropState.position.x}px, ${cropState.position.y}px) scale(${cropState.scale})`;
+      image.style.transformOrigin = '0 0';
+    }
+
+    /**
+     * Cancel crop and close modal
+     */
+    function cancelCrop() {
+      const modal = document.getElementById('cropModal');
+      modal.classList.remove('active');
+      
+      // Clear file input
+      document.getElementById('profilePicInput').value = '';
+      
+      // Remove event listeners
+      document.onmousemove = null;
+      document.onmouseup = null;
+      document.ontouchmove = null;
+      document.ontouchend = null;
+    }
+
+    /**
+     * Save the cropped image
+     */
+    function saveCrop() {
+      const container = document.getElementById('cropContainer');
+      const image = document.getElementById('cropImage');
+      
+      // Create canvas for final crop
+      const canvas = document.createElement('canvas');
+      const size = 800; // Final image size
+      canvas.width = size;
+      canvas.height = size;
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Calculate source dimensions from crop area
+      const containerSize = container.clientWidth;
+      const imageRect = image.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      // Calculate which part of the image is visible
+      const scaleRatio = image.naturalWidth / imageRect.width;
+      
+      const sourceX = (containerRect.left - imageRect.left) * scaleRatio;
+      const sourceY = (containerRect.top - imageRect.top) * scaleRatio;
+      const sourceSize = containerSize * scaleRatio;
+      
+      // Draw cropped portion to canvas
+      ctx.drawImage(
+        image,
+        sourceX, sourceY, sourceSize, sourceSize,
+        0, 0, size, size
+      );
+      
+      // Convert to compressed JPEG
+      const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      
+      // Store and update previews
+      uploadedImageData = croppedDataUrl;
+      document.getElementById('previewPic').src = croppedDataUrl;
+      document.getElementById('profilePic').src = croppedDataUrl;
+      document.getElementById('profilePicSmall').src = croppedDataUrl;
+      
+      // Close modal
+      const modal = document.getElementById('cropModal');
+      modal.classList.remove('active');
+      
+      // Log size
+      console.log(`Cropped image size: ${(croppedDataUrl.length / 1024).toFixed(0)}KB`);
+      
+      // Remove event listeners
+      document.onmousemove = null;
+      document.onmouseup = null;
+      document.ontouchmove = null;
+      document.ontouchend = null;
+    }
+    
 
     /* ==========================================================
        COLOR PICKER SYNC
@@ -1843,5 +2021,40 @@
       alert('Card has been reset to default (John Doe).');
     }
   </script>
+
+  <!-- =================================
+       IMAGE CROP MODAL
+       Allows users to position and zoom their profile picture
+       ================================= -->
+  <div class="crop-modal" id="cropModal">
+    <div class="crop-instructions">
+      Drag to reposition • Use slider to zoom
+    </div>
+    
+    <div class="crop-container" id="cropContainer">
+      <img id="cropImage" class="crop-image" src="" alt="Crop preview">
+    </div>
+    
+    <div class="crop-controls">
+      <div class="zoom-control">
+        <label>Zoom:</label>
+        <input 
+          type="range" 
+          id="zoomSlider" 
+          class="zoom-slider" 
+          min="100" 
+          max="300" 
+          value="100" 
+          step="1"
+        >
+      </div>
+      
+      <div class="crop-buttons">
+        <button class="crop-btn crop-btn-cancel" onclick="cancelCrop()">Cancel</button>
+        <button class="crop-btn crop-btn-save" onclick="saveCrop()">Save & Apply</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
