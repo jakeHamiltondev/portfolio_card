@@ -19,7 +19,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, white 0%, #6B46C1 100%);
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
