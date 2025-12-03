@@ -1264,21 +1264,77 @@
     /**
      * Initialize profile picture upload handler
      */
+    /**
+    * Initialize profile picture upload handler with compression
+    */
     document.getElementById('profilePicInput').addEventListener('change', function(event) {
       if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        
+        // Check file size (warn if > 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+          console.warn('Large image detected, will compress...');
+        }
+
         const fileReader = new FileReader();
 
         fileReader.onload = function(loadEvent) {
-          // Store as base64 data URL
-          uploadedImageData = loadEvent.target.result;
-
-          // Update all image previews
-          document.getElementById('previewPic').src = uploadedImageData;
-          document.getElementById('profilePic').src = uploadedImageData;
-          document.getElementById('profilePicSmall').src = uploadedImageData;
+          const img = new Image();
+          
+          img.onload = function() {
+            // Create canvas for resizing
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set maximum dimensions (larger dimension = 800px)
+            const MAX_SIZE = 800;
+            let width = img.width;
+            let height = img.height;
+            
+            // Calculate new dimensions maintaining aspect ratio
+            if (width > height) {
+              if (width > MAX_SIZE) {
+                height = (height * MAX_SIZE) / width;
+                width = MAX_SIZE;
+              }
+            } else {
+              if (height > MAX_SIZE) {
+                width = (width * MAX_SIZE) / height;
+                height = MAX_SIZE;
+              }
+            }
+            
+            // Set canvas size
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw resized image
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to base64 with compression (0.85 quality)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            
+            // Calculate size reduction
+            const originalSize = loadEvent.target.result.length;
+            const compressedSize = compressedDataUrl.length;
+            const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+            
+            console.log(`Image compressed: ${(originalSize/1024).toFixed(0)}KB → ${(compressedSize/1024).toFixed(0)}KB (${reduction}% reduction)`);
+            
+            // Store compressed image
+            uploadedImageData = compressedDataUrl;
+            
+            // Update all image previews
+            document.getElementById('previewPic').src = compressedDataUrl;
+            document.getElementById('profilePic').src = compressedDataUrl;
+            document.getElementById('profilePicSmall').src = compressedDataUrl;
+          };
+          
+          // Load the image
+          img.src = loadEvent.target.result;
         };
 
-        fileReader.readAsDataURL(event.target.files[0]);
+        fileReader.readAsDataURL(file);
       }
     });
 
