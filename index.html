@@ -1275,12 +1275,6 @@
     document.getElementById('profilePicInput').addEventListener('change', function(event) {
       if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
-        
-        // Check file size
-        if (file.size > 5 * 1024 * 1024) {
-          alert('Image is too large. Please choose an image under 5MB.');
-          return;
-        }
 
         const fileReader = new FileReader();
 
