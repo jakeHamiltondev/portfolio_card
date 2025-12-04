@@ -838,10 +838,19 @@
       // Build share object (exclude large data)
       const fullShareObj = buildShareObj(rawCard);
       
-      // Create QR-friendly version without profile picture
+      // Smart profile picture handling for QR codes
+      let profilePicForQR = fullShareObj.profilePic;
+      
+      // Only exclude if it's a large base64 image
+      if (profilePicForQR && profilePicForQR.startsWith('data:image')) {
+        // Base64 image - too large for QR, exclude it
+        profilePicForQR = '';
+      }
+      // If it's a URL (http/https), keep it - it's small enough
+      
       const qrShareObj = {
         ...fullShareObj,
-        profilePic: '' // Exclude image from QR code to reduce size
+        profilePic: profilePicForQR
       };
       
       const encodedCard = encodeObj(qrShareObj);
