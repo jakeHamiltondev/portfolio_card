@@ -824,11 +824,6 @@
       }
     });
 
-    /* ==========================================================
-       QR CODE GENERATION
-       Generate shareable QR code using quickchart.io
-       ========================================================== */
-
     /**
      * Generate QR code for card sharing
      * Creates shareable URL and renders QR code image
@@ -841,7 +836,14 @@
       if (!rawCard || !qrContainer) return;
 
       // Build share object (exclude large data)
-      const shareObj = buildShareObj(rawCard);
+      const fullShareObj = buildShareObj(rawCard);
+      
+      // Create QR-friendly version without profile picture
+      const qrShareObj = {
+        ...fullShareObj,
+        profilePic: '' // Exclude image from QR code to reduce size
+      };
+      
       const encodedCard = encodeObj(qrShareObj);
 
       // Build share URL
