@@ -687,22 +687,28 @@
       grid.classList.remove('is-empty');
 
       // Render contact cards
-      grid.innerHTML = contacts.map((contact, index) => `
-        <div class="saved-card">
-          <div class="saved-card-header">
-            <img src="${contact.profilePic}" alt="${contact.firstName}" class="saved-card-pic">
-            <div class="saved-card-info">
-              <h3>${contact.firstName} ${contact.lastName}</h3>
-              <p>${contact.email}</p>
+      grid.innerHTML = contacts.map((contact, index) => {
+        // Generate avatar URL if no profile pic
+        const avatarUrl = contact.profilePic && contact.profilePic.length > 100
+          ? contact.profilePic
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.firstName + '+' + contact.lastName)}&size=120&background=6366f1&color=fff&bold=true`;
+        
+        return `
+          <div class="saved-card">
+            <div class="saved-card-header">
+              <img src="${avatarUrl}" alt="${contact.firstName}" class="saved-card-pic">
+              <div class="saved-card-info">
+                <h3>${contact.firstName} ${contact.lastName}</h3>
+                <p>${contact.email}</p>
+              </div>
             </div>
-          </div>
 
           <div class="saved-card-actions">
             <button class="action-btn" onclick="viewContact(${index})">View</button>
             <button class="action-btn delete-btn" onclick="deleteContact(${index})">Delete</button>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     /**
@@ -721,6 +727,17 @@
 
       alert(`${sharedCardData.firstName} ${sharedCardData.lastName}'s card saved to your contacts!`);
       document.getElementById('saveContactBtn').classList.remove('show');
+      
+      // Return to user's own card
+      viewingSharedCard = false;
+      sharedCardData = null;
+      loadMyCard();
+      
+      // Clean up URL
+      if (location.search.includes('card=')) {
+        const cleanUrl = `${location.origin}${location.pathname}`;
+        history.replaceState({}, '', cleanUrl);
+      }
     }
 
     /**
