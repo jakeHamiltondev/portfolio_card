@@ -129,7 +129,10 @@ function applyCardData(cardData) {
   document.getElementById('emailText').textContent = cardData.email;
 
   // Update images (use placeholder if no profile pic)
-  const profilePicUrl = cardData.profilePic || 'https://via.placeholder.com/400/6366f1/ffffff?text=No+Photo';
+  const profilePicUrl = cardData.profilePic && cardData.profilePic.length > 100
+    ? cardData.profilePic 
+    : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(cardData.firstName + '+' + cardData.lastName) + '&size=400&background=6366f1&color=fff&bold=true';
+  
   document.getElementById('profilePic').src = profilePicUrl;
   document.getElementById('profilePicSmall').src = profilePicUrl;
   document.getElementById('previewPic').src = profilePicUrl;
