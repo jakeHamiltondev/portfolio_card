@@ -1133,3 +1133,58 @@ body.cropping {
     transform: translate(-50%, -50%) scale(0.8);
   }
 }
+
+/* =================================
+   BACK TO MY CARD BUTTON
+   Appears when viewing a saved contact
+   ================================= */
+
+.back-to-my-card-btn {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #6366f1;
+  border: 2px solid #6366f1;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  transition: all 0.3s;
+  display: none;
+}
+
+.back-to-my-card-btn.show {
+  display: block;
+  animation: slideDownFade 0.5s ease-out;
+}
+
+@keyframes slideDownFade {
+  from { 
+    opacity: 0; 
+    transform: translateX(-50%) translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+  }
+}
+
+.back-to-my-card-btn:hover {
+  background: #6366f1;
+  color: white;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+@media (max-width: 768px) {
+  .back-to-my-card-btn {
+    top: 75px;
+    font-size: 13px;
+    padding: 10px 20px;
+  }
+}

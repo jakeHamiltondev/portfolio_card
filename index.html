@@ -56,6 +56,11 @@
     Save to My Contacts
   </button>
 
+  <!-- Back to My Card button (shown when viewing a saved contact) -->
+  <button class="back-to-my-card-btn" id="backToMyCardBtn" onclick="returnToMyCard()">
+    ← Back to My Card
+  </button>
+
   <!-- =================================
        BUSINESS CARD
        3D flip card with front and back faces
@@ -751,7 +756,21 @@
       if (contact) {
         applyCardData(contact);
         closeHome();
+        
+        // Show "Back to My Card" button
+        document.getElementById('backToMyCardBtn').classList.add('show');
       }
+    }
+
+    /**
+     * Return to viewing user's own card
+     */
+    function returnToMyCard() {
+      // Hide the back button
+      document.getElementById('backToMyCardBtn').classList.remove('show');
+      
+      // Load user's own card
+      loadMyCard();
     }
 
     /**
@@ -823,11 +842,6 @@
 
       // Build share object (exclude large data)
       const shareObj = buildShareObj(rawCard);
-
-      const qrShareObj = { 
-        ...shareObj,
-      profilePic: '' };
-
       const encodedCard = encodeObj(qrShareObj);
 
       // Build share URL
@@ -1106,43 +1120,11 @@
         location.reload(true);
       }
     }
-  </script>
-
-  <!-- TEMPORARY DEBUG PANEL -->
-  <div id="debugPanel" style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); color: lime; padding: 10px; font-size: 11px; font-family: monospace; z-index: 99999; max-height: 150px; overflow: auto; display: none;">
-    <div id="debugOutput"></div>
-  </div>
-  
-  <button onclick="toggleDebug()" style="position: fixed; bottom: 10px; right: 10px; z-index: 100000; padding: 8px; background: red; color: white; border: none; border-radius: 4px; font-size: 10px;">
-    DEBUG
-  </button>
-
-  <script>
-    function toggleDebug() {
-      const panel = document.getElementById('debugPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      
-      if (panel.style.display === 'block') {
-        const output = document.getElementById('debugOutput');
-        const myCard = getMyCard();
-        
-        output.innerHTML = `
-          <strong>DEBUG INFO:</strong><br>
-          viewingSharedCard: ${viewingSharedCard}<br>
-          sharedCardData exists: ${sharedCardData !== null}<br>
-          myCard exists: ${myCard !== null}<br>
-          profilePic length: ${myCard?.profilePic?.length || 0}<br>
-          profilePic starts with: ${myCard?.profilePic?.substring(0, 30) || 'none'}...<br>
-          uploadedImageData exists: ${typeof uploadedImageData !== 'undefined' && uploadedImageData !== null}<br>
-          Front pic src length: ${document.getElementById('profilePic')?.src?.length || 0}
-        `;
-      }
-    }
 
     // Initialize settings module
     initializeInputValidation();
     initializeColorPickers();
     initializeImageUpload();
-  </script>
+  </script> 
 </body>
 </html>
