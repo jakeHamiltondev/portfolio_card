@@ -696,7 +696,7 @@
         // Generate avatar URL if no profile pic
         const avatarUrl = contact.profilePic && contact.profilePic.length > 100
           ? contact.profilePic
-          : `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.firstName)}&name=${encodeURIComponent(contact.lastName)}&size=120&background=6366f1&color=fff&bold=true`;
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.firstName + ' ' + contact.lastName)}&size=120&background=6366f1&color=fff&bold=true`;
         
         return `
           <div class="saved-card">

@@ -131,7 +131,7 @@ function applyCardData(cardData) {
   // Update images (use placeholder if no profile pic)
   const profilePicUrl = cardData.profilePic && cardData.profilePic.length > 100
     ? cardData.profilePic 
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(cardData.firstName)}&name=${encodeURIComponent(cardData.lastName)}&size=400&background=6366f1&color=fff&bold=true`;
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(cardData.firstName + ' ' + cardData.lastName)}&size=400&background=6366f1&color=fff&bold=true`;
   
   document.getElementById('profilePic').src = profilePicUrl;
   document.getElementById('profilePicSmall').src = profilePicUrl;
