@@ -161,14 +161,30 @@ function generateQRCode() {
 
 /**
  * Build shareable URL from current card data
- * Includes full profile picture (for Copy Link functionality)
+ * Smart handling: keeps URL-based images, excludes large base64 images
  * @returns {string} Complete shareable URL
  */
 function buildShareUrlFromUI() {
   const rawCard = getMyCard();
   if (!rawCard) return `${location.origin}${location.pathname}`;
 
-  const shareObj = buildShareObj(rawCard);
+  const fullShareObj = buildShareObj(rawCard);
+  
+  // Smart profile picture handling (same logic as QR code)
+  let profilePicForURL = fullShareObj.profilePic;
+  
+  // Only exclude if it's a large base64 image
+  if (profilePicForURL && profilePicForURL.startsWith('data:image')) {
+    // Base64 image - too large for URL, exclude it
+    profilePicForURL = '';
+  }
+  // If it's a URL (http/https), keep it - it's small enough
+  
+  const shareObj = {
+    ...fullShareObj,
+    profilePic: profilePicForURL
+  };
+  
   const encodedCard = encodeObj(shareObj);
 
   let baseUrl = `${location.origin}${location.pathname}`;
